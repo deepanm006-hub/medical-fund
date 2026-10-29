@@ -131,26 +131,27 @@
       </a>
 
       <!-- Desktop Nav -->
-      <nav class="hidden md:flex items-center space-x-6 text-sm font-semibold text-slate-600">
+      <nav class="hidden md:flex items-center space-x-5 text-sm font-semibold text-slate-600">
         <a href="#campaigns-section" class="hover:text-brand-600 transition-colors">Explore Causes</a>
         <a href="#urgent-section" class="hover:text-urgent-600 transition-colors flex items-center space-x-1 text-urgent-600 font-bold">
           <span class="relative flex h-2 w-2 mr-1">
             <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-urgent-500 opacity-75"></span>
             <span class="relative inline-flex rounded-full h-2 w-2 bg-urgent-600"></span>
           </span>
-          <span>Emergency Relief</span>
+          <span>Emergency</span>
         </a>
         <button id="btn-open-hospitals-directory" class="hover:text-brand-600 transition-colors flex items-center space-x-1">
           <i data-lucide="building" class="w-4 h-4 text-brand-600"></i>
           <span>Partner Hospitals</span>
         </button>
-        <a href="#verification-section" class="hover:text-brand-600 transition-colors">Clinical Trust</a>
-        
-        <!-- Hospital Auditor Portal Link with pending badge -->
         <button id="btn-open-auditor-portal" class="hover:text-tealbrand-600 transition-colors flex items-center space-x-1 text-tealbrand-600 font-bold">
           <i data-lucide="stethoscope" class="w-4 h-4"></i>
           <span>Auditor Portal</span>
           <span id="pending-audits-badge" class="ml-1 px-1.5 py-0.2 bg-amber-500 text-white rounded-full text-[10px] font-extrabold hidden">1</span>
+        </button>
+        <button id="btn-open-modules-hub" class="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-900 text-white hover:bg-slate-800 shadow-sm transition-all">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+          <span>All Modules (12 Active)</span>
         </button>
       </nav>
 
@@ -172,6 +173,10 @@
     <div id="mobile-menu" class="hidden md:hidden border-t border-slate-200 bg-white px-4 pt-3 pb-6 space-y-3 text-sm font-semibold text-slate-700 shadow-lg">
       <a href="#campaigns-section" class="block py-2 hover:text-brand-600 mobile-nav-link">Explore Causes</a>
       <a href="#urgent-section" class="block py-2 text-urgent-600 font-bold mobile-nav-link">Emergency Relief Cases</a>
+      <button onclick="app.openModulesHubModal()" class="w-full text-left py-2 text-brand-600 font-bold flex items-center justify-between">
+        <span>All 12 Platform Modules</span>
+        <span class="px-2 py-0.5 bg-emerald-100 text-emerald-800 rounded-full text-xs font-bold">12 Active</span>
+      </button>
       <button onclick="app.openHospitalsModal()" class="w-full text-left py-2 hover:text-brand-600 font-bold flex items-center space-x-2">
         <i data-lucide="building" class="w-4 h-4 text-brand-600"></i>
         <span>Partner Hospitals Directory</span>
@@ -535,7 +540,7 @@
             <li><a href="#urgent-section" class="hover:text-emerald-400 transition-colors">Emergency Cases</a></li>
             <li><button onclick="app.openHospitalsModal()" class="hover:text-emerald-400 transition-colors">Partner Hospital Network</button></li>
             <li><button onclick="app.openAuditorModal()" class="hover:text-emerald-400 transition-colors">Hospital Verification Portal</button></li>
-            <li><button onclick="document.getElementById('btn-open-create').click()" class="hover:text-emerald-400 transition-colors">Start a Fundraiser</button></li>
+            <li><button onclick="app.openModulesHubModal()" class="hover:text-emerald-400 transition-colors">All 12 Modules Hub</button></li>
           </ul>
         </div>
 
@@ -1269,6 +1274,269 @@
           </button>
         </div>
       </form>
+    </div>
+  </div>
+
+  <!-- 11. DEDICATED AUDITED MEDICAL DOCUMENT VIEWER MODAL -->
+  <div id="modal-doc-viewer" class="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 hidden">
+    <div class="modal-overlay fixed inset-0 bg-slate-900/60 backdrop-blur-sm" onclick="app.closeDocViewerModal()"></div>
+
+    <div class="modal-content relative bg-white w-full max-w-2xl max-h-[92vh] rounded-3xl shadow-2xl overflow-y-auto z-10 border border-slate-200 p-6 sm:p-8">
+      
+      <button onclick="app.closeDocViewerModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-800">
+        <i data-lucide="x" class="w-5 h-5"></i>
+      </button>
+
+      <!-- Hospital Document Letterhead Header -->
+      <div class="border-b-2 border-slate-900 pb-4 mb-5 flex items-start justify-between">
+        <div class="space-y-1">
+          <div class="inline-flex items-center space-x-1.5 px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-bold border border-emerald-300">
+            <i data-lucide="shield-check" class="w-3 h-3"></i>
+            <span>AUDITED & DIGITALLY VERIFIED CLINICAL RECORD</span>
+          </div>
+          <h3 class="text-xl font-extrabold text-slate-900 tracking-tight" id="doc-view-title">Hospital Surgical Estimate</h3>
+          <p class="text-xs text-slate-500" id="doc-view-issuer">Issued by: Fortis Escorts Heart Institute Desk</p>
+        </div>
+        <div class="text-right">
+          <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Registration Code</span>
+          <span class="font-mono text-emerald-700 font-bold text-sm" id="doc-view-ref">EST-FEHI-8941</span>
+        </div>
+      </div>
+
+      <!-- Document Body Details -->
+      <div class="space-y-4 text-xs">
+        <div class="grid grid-cols-2 gap-3 bg-slate-50 p-3.5 rounded-2xl border border-slate-200">
+          <div>
+            <span class="text-slate-400 block font-medium">Document Classification</span>
+            <span class="font-bold text-slate-800" id="doc-view-type">Clinical Estimate Letter</span>
+          </div>
+          <div>
+            <span class="text-slate-400 block font-medium">Audit Verification State</span>
+            <span class="font-bold text-emerald-700 flex items-center">
+              <i data-lucide="check-circle-2" class="w-3.5 h-3.5 mr-1 text-emerald-600"></i>
+              Authentic & Validated
+            </span>
+          </div>
+        </div>
+
+        <div class="p-4 rounded-2xl bg-amber-50/50 border border-amber-200 text-amber-950 space-y-1 leading-relaxed">
+          <span class="font-bold block text-xs">Clinical Advisory Board Verification Statement:</span>
+          <p class="text-[11px] text-amber-900">
+            This medical certificate has been authenticated against the hospital’s inpatient billing desk. All donor contributions corresponding to this estimate are disbursed directly to the verified hospital account.
+          </p>
+        </div>
+
+        <!-- Digital Seal & Signatures -->
+        <div class="pt-4 border-t border-slate-200 flex items-center justify-between">
+          <div class="flex items-center space-x-2">
+            <div class="w-10 h-10 rounded-xl bg-emerald-600 text-white flex items-center justify-center font-bold text-xs shadow-md">
+              SEAL
+            </div>
+            <div>
+              <span class="font-bold text-slate-900 block text-xs">Certified Medical Desk</span>
+              <span class="text-[10px] text-slate-400">Timestamp: 2026-10-29 Verified</span>
+            </div>
+          </div>
+          <div class="text-right">
+            <span class="font-signature italic font-serif text-sm text-slate-800 block">Dr. Arvind Mehta, M.Ch</span>
+            <span class="text-[10px] text-slate-400">Chief Clinical Verifier</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between gap-3">
+        <button onclick="window.print()" class="px-4 py-2 border border-slate-300 rounded-xl text-slate-700 font-bold text-xs hover:bg-slate-50 flex items-center space-x-1.5 transition-colors">
+          <i data-lucide="printer" class="w-4 h-4"></i>
+          <span>Print Document</span>
+        </button>
+        <button onclick="app.closeDocViewerModal()" class="px-5 py-2 bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs rounded-xl transition-colors">
+          Close Viewer
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- 12. ALL PLATFORM MODULES CONTROL HUB MODAL -->
+  <div id="modal-modules-hub" class="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 hidden">
+    <div class="modal-overlay fixed inset-0 bg-slate-900/60 backdrop-blur-sm" onclick="app.closeModulesHubModal()"></div>
+
+    <div class="modal-content relative bg-white w-full max-w-4xl max-h-[92vh] rounded-3xl shadow-2xl overflow-y-auto z-10 border border-slate-200">
+      
+      <div class="p-6 bg-gradient-to-r from-slate-900 via-teal-950 to-indigo-950 text-white relative">
+        <button onclick="app.closeModulesHubModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+        <div class="flex items-center space-x-2 mb-1">
+          <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
+          <span class="text-xs uppercase tracking-wider font-extrabold text-emerald-300">System Architecture Overview</span>
+        </div>
+        <h3 class="text-2xl font-extrabold">All 12 Platform Modules Active</h3>
+        <p class="text-xs text-slate-300 mt-1 max-w-xl">
+          Every component in the MedicalFund architecture is connected, operational, and persistent in LocalStorage.
+        </p>
+      </div>
+
+      <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+        
+        <!-- Module 1 -->
+        <div class="p-4 bg-slate-50 rounded-2xl border border-slate-200 flex items-start justify-between">
+          <div class="space-y-1">
+            <span class="font-extrabold text-slate-900 text-xs block flex items-center">
+              <span class="w-2 h-2 rounded-full bg-emerald-500 mr-2"></span> Module 1: Live Search & Filters
+            </span>
+            <p class="text-[11px] text-slate-500">Live multi-field search across patient names, diagnoses, hospitals, and category pills.</p>
+          </div>
+          <button onclick="app.closeModulesHubModal(); document.getElementById('search-input').focus();" class="px-2.5 py-1 bg-white border border-slate-300 hover:bg-slate-100 rounded-lg text-[10px] font-bold text-slate-700 flex-shrink-0">
+            Test
+          </button>
+        </div>
+
+        <!-- Module 2 -->
+        <div class="p-4 bg-slate-50 rounded-2xl border border-slate-200 flex items-start justify-between">
+          <div class="space-y-1">
+            <span class="font-extrabold text-slate-900 text-xs block flex items-center">
+              <span class="w-2 h-2 rounded-full bg-emerald-500 mr-2"></span> Module 2: 5-Tab Case Records
+            </span>
+            <p class="text-[11px] text-slate-500">Story, clinical documents, recovery updates timeline, hospital payout ledger, supporters.</p>
+          </div>
+          <button onclick="app.closeModulesHubModal(); app.openDetailModal('med-001');" class="px-2.5 py-1 bg-white border border-slate-300 hover:bg-slate-100 rounded-lg text-[10px] font-bold text-slate-700 flex-shrink-0">
+            Open
+          </button>
+        </div>
+
+        <!-- Module 3 -->
+        <div class="p-4 bg-slate-50 rounded-2xl border border-slate-200 flex items-start justify-between">
+          <div class="space-y-1">
+            <span class="font-extrabold text-slate-900 text-xs block flex items-center">
+              <span class="w-2 h-2 rounded-full bg-emerald-500 mr-2"></span> Module 3: Payment Checkout
+            </span>
+            <p class="text-[11px] text-slate-500">Credit card, dynamic UPI QR scanner, digital wallets, 3-phase escrow simulation & 80G tax receipt.</p>
+          </div>
+          <button onclick="app.closeModulesHubModal(); app.openDonateModal('med-001');" class="px-2.5 py-1 bg-emerald-600 text-white rounded-lg text-[10px] font-bold flex-shrink-0">
+            Donate
+          </button>
+        </div>
+
+        <!-- Module 4 -->
+        <div class="p-4 bg-slate-50 rounded-2xl border border-slate-200 flex items-start justify-between">
+          <div class="space-y-1">
+            <span class="font-extrabold text-slate-900 text-xs block flex items-center">
+              <span class="w-2 h-2 rounded-full bg-emerald-500 mr-2"></span> Module 4: Clinical Recovery Updates
+            </span>
+            <p class="text-[11px] text-slate-500">Patients & surgeons post live chronological recovery milestones with live append.</p>
+          </div>
+          <button onclick="app.closeModulesHubModal(); app.openPostUpdateModal('med-001');" class="px-2.5 py-1 bg-white border border-slate-300 hover:bg-slate-100 rounded-lg text-[10px] font-bold text-slate-700 flex-shrink-0">
+            Post
+          </button>
+        </div>
+
+        <!-- Module 5 -->
+        <div class="p-4 bg-slate-50 rounded-2xl border border-slate-200 flex items-start justify-between">
+          <div class="space-y-1">
+            <span class="font-extrabold text-slate-900 text-xs block flex items-center">
+              <span class="w-2 h-2 rounded-full bg-emerald-500 mr-2"></span> Module 5: Hospital Auditor Portal
+            </span>
+            <p class="text-[11px] text-slate-500">Audit queue for pending cases, 1-click verification, direct hospital tranche payouts.</p>
+          </div>
+          <button onclick="app.closeModulesHubModal(); app.openAuditorModal();" class="px-2.5 py-1 bg-teal-600 text-white rounded-lg text-[10px] font-bold flex-shrink-0">
+            Audit
+          </button>
+        </div>
+
+        <!-- Module 6 -->
+        <div class="p-4 bg-slate-50 rounded-2xl border border-slate-200 flex items-start justify-between">
+          <div class="space-y-1">
+            <span class="font-extrabold text-slate-900 text-xs block flex items-center">
+              <span class="w-2 h-2 rounded-full bg-emerald-500 mr-2"></span> Module 6: Partner Hospital Network
+            </span>
+            <p class="text-[11px] text-slate-500">Accredited hospital directory, bed quotas, ICU metrics, escrow onboarding.</p>
+          </div>
+          <button onclick="app.closeModulesHubModal(); app.openHospitalsModal();" class="px-2.5 py-1 bg-indigo-600 text-white rounded-lg text-[10px] font-bold flex-shrink-0">
+            View
+          </button>
+        </div>
+
+        <!-- Module 7 -->
+        <div class="p-4 bg-slate-50 rounded-2xl border border-slate-200 flex items-start justify-between">
+          <div class="space-y-1">
+            <span class="font-extrabold text-slate-900 text-xs block flex items-center">
+              <span class="w-2 h-2 rounded-full bg-emerald-500 mr-2"></span> Module 7: Campaign Creation Wizard
+            </span>
+            <p class="text-[11px] text-slate-500">Multi-step form with patient diagnosis, hospital data, goal calculation, and document upload.</p>
+          </div>
+          <button onclick="app.closeModulesHubModal(); app.openCreateModal();" class="px-2.5 py-1 bg-brand-600 text-white rounded-lg text-[10px] font-bold flex-shrink-0">
+            Create
+          </button>
+        </div>
+
+        <!-- Module 8 -->
+        <div class="p-4 bg-slate-50 rounded-2xl border border-slate-200 flex items-start justify-between">
+          <div class="space-y-1">
+            <span class="font-extrabold text-slate-900 text-xs block flex items-center">
+              <span class="w-2 h-2 rounded-full bg-emerald-500 mr-2"></span> Module 8: Tax Receipts & Ledger
+            </span>
+            <p class="text-[11px] text-slate-500">Instant 80G/501(c)(3) tax-exempt receipt generation with print & PDF download.</p>
+          </div>
+          <button onclick="app.closeModulesHubModal(); app.openAllReceiptsModal();" class="px-2.5 py-1 bg-white border border-slate-300 hover:bg-slate-100 rounded-lg text-[10px] font-bold text-slate-700 flex-shrink-0">
+            Receipts
+          </button>
+        </div>
+
+        <!-- Module 9 -->
+        <div class="p-4 bg-slate-50 rounded-2xl border border-slate-200 flex items-start justify-between">
+          <div class="space-y-1">
+            <span class="font-extrabold text-slate-900 text-xs block flex items-center">
+              <span class="w-2 h-2 rounded-full bg-emerald-500 mr-2"></span> Module 9: Case Bookmarking
+            </span>
+            <p class="text-[11px] text-slate-500">Follow patient recoveries and access saved cases from the header.</p>
+          </div>
+          <button onclick="app.closeModulesHubModal(); app.openBookmarksModal();" class="px-2.5 py-1 bg-white border border-slate-300 hover:bg-slate-100 rounded-lg text-[10px] font-bold text-slate-700 flex-shrink-0">
+            Saved
+          </button>
+        </div>
+
+        <!-- Module 10 -->
+        <div class="p-4 bg-slate-50 rounded-2xl border border-slate-200 flex items-start justify-between">
+          <div class="space-y-1">
+            <span class="font-extrabold text-slate-900 text-xs block flex items-center">
+              <span class="w-2 h-2 rounded-full bg-emerald-500 mr-2"></span> Module 10: Multi-Currency Engine
+            </span>
+            <p class="text-[11px] text-slate-500">Live dynamic conversion between USD ($), INR (₹), EUR (€), and GBP (£).</p>
+          </div>
+          <span class="px-2.5 py-1 bg-slate-200 text-slate-700 rounded-lg text-[10px] font-bold">
+            Active
+          </span>
+        </div>
+
+        <!-- Module 11 -->
+        <div class="p-4 bg-slate-50 rounded-2xl border border-slate-200 flex items-start justify-between">
+          <div class="space-y-1">
+            <span class="font-extrabold text-slate-900 text-xs block flex items-center">
+              <span class="w-2 h-2 rounded-full bg-emerald-500 mr-2"></span> Module 11: Multi-Role Switcher
+            </span>
+            <p class="text-[11px] text-slate-500">Donor, Hospital Auditor, and Patient Family contextual workflows.</p>
+          </div>
+          <span class="px-2.5 py-1 bg-slate-200 text-slate-700 rounded-lg text-[10px] font-bold">
+            Active
+          </span>
+        </div>
+
+        <!-- Module 12 -->
+        <div class="p-4 bg-slate-50 rounded-2xl border border-slate-200 flex items-start justify-between">
+          <div class="space-y-1">
+            <span class="font-extrabold text-slate-900 text-xs block flex items-center">
+              <span class="w-2 h-2 rounded-full bg-emerald-500 mr-2"></span> Module 12: Zero-Dependency Server
+            </span>
+            <p class="text-[11px] text-slate-500">Built-in local PowerShell HTTP server (`server.ps1`) and VS Code shortcut (`Ctrl+Shift+B`).</p>
+          </div>
+          <span class="px-2.5 py-1 bg-emerald-100 text-emerald-800 rounded-lg text-[10px] font-bold">
+            server.ps1
+          </span>
+        </div>
+
+      </div>
+
     </div>
   </div>
 

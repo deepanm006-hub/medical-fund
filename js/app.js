@@ -162,6 +162,11 @@ class MedicalFundApp {
       btnHospitals.addEventListener("click", () => this.openHospitalsModal());
     }
 
+    const btnModules = document.getElementById("btn-open-modules-hub");
+    if (btnModules) {
+      btnModules.addEventListener("click", () => this.openModulesHubModal());
+    }
+
     // Donation Form Submit
     const donationForm = document.getElementById("donation-form");
     if (donationForm) {
@@ -921,7 +926,44 @@ class MedicalFundApp {
   }
 
   showDocumentPreview(title, type, issuedBy, docNumber) {
-    alert(`AUDITED MEDICAL DOCUMENT\n\nTitle: ${title}\nType: ${type}\nIssued By: ${issuedBy}\nRegistration Ref: ${docNumber}\nClinical Authenticity: Verified against hospital inpatient database.`);
+    this.openDocViewerModal(title, type, issuedBy, docNumber);
+  }
+
+  openDocViewerModal(title, type, issuedBy, docNumber) {
+    const modal = document.getElementById("modal-doc-viewer");
+    if (!modal) return;
+
+    const titleEl = document.getElementById("doc-view-title");
+    const issuerEl = document.getElementById("doc-view-issuer");
+    const refEl = document.getElementById("doc-view-ref");
+    const typeEl = document.getElementById("doc-view-type");
+
+    if (titleEl) titleEl.textContent = title || "Clinical Record";
+    if (issuerEl) issuerEl.textContent = `Issued by: ${issuedBy || "Clinical Center"}`;
+    if (refEl) refEl.textContent = docNumber || "REG-DOC-001";
+    if (typeEl) typeEl.textContent = type || "Medical Certificate";
+
+    modal.classList.remove("hidden");
+    if (window.lucide) window.lucide.createIcons();
+  }
+
+  closeDocViewerModal() {
+    const modal = document.getElementById("modal-doc-viewer");
+    if (modal) modal.classList.add("hidden");
+  }
+
+  // --- All 12 Modules Hub Modal ---
+  openModulesHubModal() {
+    const modal = document.getElementById("modal-modules-hub");
+    if (modal) {
+      modal.classList.remove("hidden");
+      if (window.lucide) window.lucide.createIcons();
+    }
+  }
+
+  closeModulesHubModal() {
+    const modal = document.getElementById("modal-modules-hub");
+    if (modal) modal.classList.add("hidden");
   }
 
   // --- Bookmarking / Saving Cases ---

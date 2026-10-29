@@ -17,27 +17,33 @@ class MedicalFundStorage {
   }
 
   init() {
-    // Populate seed data if not present or needs reset
+    // Populate seed data and merge schema properties
     const existing = localStorage.getItem(STORAGE_KEYS.CAMPAIGNS);
     if (!existing) {
       localStorage.setItem(STORAGE_KEYS.CAMPAIGNS, JSON.stringify(INITIAL_CAMPAIGNS));
     } else {
       try {
-        const parsed = JSON.parse(existing);
-        let updated = false;
-        parsed.forEach(c => {
-          if (!c.medicalDocuments) {
-            c.medicalDocuments = [];
-            updated = true;
-          }
-          if (!c.disbursements) {
-            c.disbursements = [];
-            updated = true;
+        let parsed = JSON.parse(existing);
+        
+        // Ensure all initial seed campaigns exist and have rich clinical structures
+        INITIAL_CAMPAIGNS.forEach(seed => {
+          const idx = parsed.findIndex(p => p.id === seed.id);
+          if (idx === -1) {
+            parsed.push(seed);
+          } else {
+            parsed[idx] = {
+              ...seed,
+              raisedAmount: parsed[idx].raisedAmount || seed.raisedAmount,
+              donorCount: parsed[idx].donorCount || seed.donorCount,
+              donors: (parsed[idx].donors && parsed[idx].donors.length > 0) ? parsed[idx].donors : seed.donors,
+              updates: (parsed[idx].updates && parsed[idx].updates.length > 0) ? parsed[idx].updates : seed.updates,
+              medicalDocuments: (parsed[idx].medicalDocuments && parsed[idx].medicalDocuments.length > 0) ? parsed[idx].medicalDocuments : seed.medicalDocuments,
+              disbursements: (parsed[idx].disbursements && parsed[idx].disbursements.length > 0) ? parsed[idx].disbursements : seed.disbursements
+            };
           }
         });
-        if (updated) {
-          localStorage.setItem(STORAGE_KEYS.CAMPAIGNS, JSON.stringify(parsed));
-        }
+
+        localStorage.setItem(STORAGE_KEYS.CAMPAIGNS, JSON.stringify(parsed));
       } catch (e) {
         localStorage.setItem(STORAGE_KEYS.CAMPAIGNS, JSON.stringify(INITIAL_CAMPAIGNS));
       }
