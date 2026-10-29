@@ -62,30 +62,53 @@
 <body class="bg-slate-50 text-slate-800 font-sans antialiased selection:bg-brand-500 selection:text-white min-h-screen flex flex-col">
 
   <!-- ================= TOP NOTIFICATION BAR ================= -->
-  <div class="bg-gradient-to-r from-teal-900 via-slate-900 to-emerald-950 text-slate-200 text-xs sm:text-sm py-2 px-4 border-b border-teal-800/40">
-    <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-2">
+  <div class="bg-gradient-to-r from-teal-900 via-slate-900 to-emerald-950 text-slate-200 text-xs py-2 px-4 border-b border-teal-800/40">
+    <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3">
+      
+      <!-- Left: Clinical Trust Badge -->
       <div class="flex items-center space-x-2">
-        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
           <i data-lucide="shield-check" class="w-3.5 h-3.5 mr-1"></i> 100% Verified
         </span>
-        <span class="hidden sm:inline text-slate-300">Direct hospital disbursement — Every bill audited by certified clinical partners.</span>
-        <span class="sm:hidden text-slate-300">Audited clinical disbursements.</span>
+        <span class="hidden sm:inline text-slate-300 text-xs">Direct hospital disbursement — Every bill audited by certified clinical partners.</span>
       </div>
-      <div class="flex items-center space-x-4">
+
+      <!-- Right: Role Switcher, Bookmarks, Currency & Receipts -->
+      <div class="flex items-center flex-wrap gap-3">
+        
+        <!-- Active Role Indicator / Switcher -->
+        <div class="flex items-center space-x-1 bg-slate-800/80 px-2 py-0.5 rounded-lg border border-slate-700 text-[11px]">
+          <i data-lucide="user-check" class="w-3 h-3 text-emerald-400"></i>
+          <span class="text-slate-400">Role:</span>
+          <select id="role-select" class="bg-transparent text-emerald-300 font-bold focus:outline-none cursor-pointer">
+            <option value="donor" class="bg-slate-900 text-slate-200">Donor</option>
+            <option value="hospital_auditor" class="bg-slate-900 text-slate-200">Hospital Auditor</option>
+            <option value="patient_family" class="bg-slate-900 text-slate-200">Patient Family</option>
+          </select>
+        </div>
+
+        <!-- Bookmarks Button -->
+        <button id="btn-view-bookmarks" class="hover:text-amber-300 transition-colors flex items-center space-x-1 font-medium text-xs">
+          <i data-lucide="bookmark" class="w-3.5 h-3.5 text-amber-400"></i>
+          <span>Saved (<span id="my-bookmarks-count">0</span>)</span>
+        </button>
+
         <!-- Currency Selector -->
-        <div class="flex items-center space-x-1.5">
-          <span class="text-slate-400 text-xs">Currency:</span>
-          <select id="currency-select" class="bg-slate-800/90 text-slate-200 text-xs font-medium rounded-md px-2 py-1 border border-slate-700 focus:outline-none focus:border-brand-500">
+        <div class="flex items-center space-x-1">
+          <select id="currency-select" class="bg-slate-800/90 text-slate-200 text-xs font-semibold rounded-md px-2 py-1 border border-slate-700 focus:outline-none focus:border-brand-500">
             <option value="USD">USD ($)</option>
             <option value="INR">INR (₹)</option>
             <option value="EUR">EUR (€)</option>
             <option value="GBP">GBP (£)</option>
           </select>
         </div>
-        <button id="btn-view-receipts" class="hover:text-emerald-300 transition-colors flex items-center space-x-1 text-xs font-medium">
-          <i data-lucide="receipt" class="w-3.5 h-3.5"></i>
+
+        <!-- My Receipts -->
+        <button id="btn-view-receipts" class="hover:text-emerald-300 transition-colors flex items-center space-x-1 font-medium text-xs">
+          <i data-lucide="receipt" class="w-3.5 h-3.5 text-emerald-400"></i>
           <span>My Receipts (<span id="my-receipts-count">0</span>)</span>
         </button>
+
       </div>
     </div>
   </div>
@@ -108,10 +131,8 @@
       </a>
 
       <!-- Desktop Nav -->
-      <nav class="hidden md:flex items-center space-x-8 text-sm font-semibold text-slate-600">
-        <a href="#campaigns-section" class="hover:text-brand-600 transition-colors flex items-center space-x-1">
-          <span>Explore Causes</span>
-        </a>
+      <nav class="hidden md:flex items-center space-x-7 text-sm font-semibold text-slate-600">
+        <a href="#campaigns-section" class="hover:text-brand-600 transition-colors">Explore Causes</a>
         <a href="#urgent-section" class="hover:text-urgent-600 transition-colors flex items-center space-x-1 text-urgent-600 font-bold">
           <span class="relative flex h-2 w-2 mr-1">
             <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-urgent-500 opacity-75"></span>
@@ -119,8 +140,14 @@
           </span>
           <span>Emergency Relief</span>
         </a>
-        <a href="#verification-section" class="hover:text-brand-600 transition-colors">How It Works</a>
-        <a href="#impact-stats" class="hover:text-brand-600 transition-colors">Impact & Trust</a>
+        <a href="#verification-section" class="hover:text-brand-600 transition-colors">Clinical Trust</a>
+        
+        <!-- Hospital Auditor Portal Link with pending badge -->
+        <button id="btn-open-auditor-portal" class="hover:text-tealbrand-600 transition-colors flex items-center space-x-1 text-tealbrand-600 font-bold">
+          <i data-lucide="building-2" class="w-4 h-4"></i>
+          <span>Hospital Portal</span>
+          <span id="pending-audits-badge" class="ml-1 px-1.5 py-0.2 bg-amber-500 text-white rounded-full text-[10px] font-extrabold hidden">1</span>
+        </button>
       </nav>
 
       <!-- CTA Action -->
@@ -141,14 +168,16 @@
     <div id="mobile-menu" class="hidden md:hidden border-t border-slate-200 bg-white px-4 pt-3 pb-6 space-y-3 text-sm font-semibold text-slate-700 shadow-lg">
       <a href="#campaigns-section" class="block py-2 hover:text-brand-600 mobile-nav-link">Explore Causes</a>
       <a href="#urgent-section" class="block py-2 text-urgent-600 font-bold mobile-nav-link">Emergency Relief Cases</a>
-      <a href="#verification-section" class="block py-2 hover:text-brand-600 mobile-nav-link">How Verification Works</a>
-      <a href="#impact-stats" class="block py-2 hover:text-brand-600 mobile-nav-link">Impact & Trust</a>
+      <button onclick="app.openAuditorModal()" class="w-full text-left py-2 text-tealbrand-600 font-bold flex items-center justify-between">
+        <span>Hospital Auditor Portal</span>
+        <span id="mobile-pending-badge" class="px-2 py-0.5 bg-amber-100 text-amber-800 rounded-full text-xs">Audit Cases</span>
+      </button>
+      <a href="#verification-section" class="block py-2 hover:text-brand-600 mobile-nav-link">Clinical Trust Framework</a>
     </div>
   </header>
 
   <!-- ================= HERO SECTION ================= -->
   <section class="relative overflow-hidden bg-gradient-to-b from-emerald-50/60 via-slate-50 to-white pt-12 pb-16 lg:pt-20 lg:pb-24 border-b border-slate-200/60">
-    <!-- Background Glow Blobs -->
     <div class="absolute -top-24 left-1/2 -translate-x-1/2 w-[700px] h-[350px] bg-gradient-to-r from-emerald-200/40 via-teal-100/50 to-sky-200/40 blur-3xl -z-10 pointer-events-none rounded-full"></div>
 
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -192,11 +221,11 @@
             </div>
             <div class="flex items-center space-x-1.5">
               <i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-600"></i>
-              <span>Hospital Quota Verified</span>
+              <span>Direct Hospital Ledger Audited</span>
             </div>
             <div class="flex items-center space-x-1.5">
               <i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-600"></i>
-              <span>Instant Digital Tax Receipt</span>
+              <span>Clinical Recovery Timelines</span>
             </div>
           </div>
         </div>
@@ -258,8 +287,8 @@
                 <i data-lucide="badge-check" class="w-6 h-6"></i>
               </div>
               <div class="text-left pr-2">
-                <div class="text-xs font-bold text-slate-900">Hospital Verified</div>
-                <div class="text-[11px] text-slate-500">Reg # FEHI/CAR/8941</div>
+                <div class="text-xs font-bold text-slate-900">Direct Hospital Settlement</div>
+                <div class="text-[11px] text-slate-500">Tranches Audited Live</div>
               </div>
             </div>
 
@@ -332,7 +361,7 @@
         </button>
       </div>
 
-      <!-- Urgent Campaigns Grid (Populated dynamically) -->
+      <!-- Urgent Campaigns Grid -->
       <div id="urgent-campaigns-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <!-- Rendered by app.js -->
       </div>
@@ -377,7 +406,7 @@
       <!-- Quick Summary & Sort dropdown -->
       <div class="w-full md:w-auto flex items-center justify-between md:justify-end space-x-4">
         <span class="text-xs font-semibold text-slate-500" id="campaigns-counter">
-          Showing 6 campaigns
+          Showing campaigns
         </span>
 
         <div class="flex items-center space-x-2">
@@ -496,7 +525,7 @@
           <ul class="space-y-2 text-xs">
             <li><a href="#campaigns-section" class="hover:text-emerald-400 transition-colors">Browse Fundraisers</a></li>
             <li><a href="#urgent-section" class="hover:text-emerald-400 transition-colors">Emergency Cases</a></li>
-            <li><a href="#verification-section" class="hover:text-emerald-400 transition-colors">Verification Process</a></li>
+            <li><button onclick="app.openAuditorModal()" class="hover:text-emerald-400 transition-colors">Hospital Verification Portal</button></li>
             <li><button onclick="document.getElementById('btn-open-create').click()" class="hover:text-emerald-400 transition-colors">Start a Fundraiser</button></li>
           </ul>
         </div>
@@ -539,13 +568,11 @@
 
   <!-- ================= MODALS ================= -->
 
-  <!-- 1. CAMPAIGN DETAIL MODAL -->
-  <div id="modal-detail" class="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 hidden">
-    <!-- Backdrop -->
+  <!-- 1. CAMPAIGN DETAIL MODAL (5-TAB ARCHITECTURE) -->
+  <div id="modal-detail" class="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 hidden">
     <div class="modal-overlay fixed inset-0 bg-slate-900/60 backdrop-blur-sm" onclick="app.closeDetailModal()"></div>
 
-    <!-- Modal Card -->
-    <div class="modal-content relative bg-white w-full max-w-4xl max-h-[92vh] rounded-3xl shadow-2xl overflow-y-auto z-10 border border-slate-200">
+    <div class="modal-content relative bg-white w-full max-w-5xl max-h-[94vh] rounded-3xl shadow-2xl overflow-y-auto z-10 border border-slate-200">
       
       <!-- Close Button -->
       <button onclick="app.closeDetailModal()" class="absolute top-4 right-4 z-20 w-10 h-10 rounded-full bg-white/90 hover:bg-white text-slate-600 hover:text-slate-900 shadow-md flex items-center justify-center border border-slate-200 transition-all">
@@ -905,7 +932,7 @@
               Hospital Estimate Letter & Doctor Prescription
             </span>
             <p class="text-emerald-800 leading-relaxed text-[11px]">
-              Our system simulates immediate verification and assigns an official hospital quota code to your fundraiser upon submission.
+              Our system assigns an official hospital quota code to your fundraiser upon submission.
             </p>
           </div>
 
@@ -943,6 +970,109 @@
       <div id="all-receipts-list" class="space-y-3">
         <!-- Rendered by app.js -->
       </div>
+    </div>
+  </div>
+
+  <!-- 6. BOOKMARKS (SAVED CASES) MODAL -->
+  <div id="modal-bookmarks" class="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 hidden">
+    <div class="modal-overlay fixed inset-0 bg-slate-900/60 backdrop-blur-sm" onclick="app.closeBookmarksModal()"></div>
+
+    <div class="modal-content relative bg-white w-full max-w-xl max-h-[85vh] rounded-3xl shadow-2xl overflow-y-auto z-10 border border-slate-200 p-6">
+      <div class="flex items-center justify-between border-b border-slate-100 pb-4 mb-4">
+        <div class="flex items-center space-x-2">
+          <div class="w-8 h-8 rounded-xl bg-amber-100 text-amber-600 flex items-center justify-center">
+            <i data-lucide="bookmark" class="w-4 h-4"></i>
+          </div>
+          <div>
+            <h3 class="text-lg font-extrabold text-slate-900">Saved Medical Cases</h3>
+            <p class="text-xs text-slate-500">Follow patient recoveries and updates.</p>
+          </div>
+        </div>
+        <button onclick="app.closeBookmarksModal()" class="text-slate-400 hover:text-slate-700">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <div id="bookmarks-list" class="space-y-3">
+        <!-- Rendered by app.js -->
+      </div>
+    </div>
+  </div>
+
+  <!-- 7. HOSPITAL AUDITOR & CLINICAL VERIFICATION PORTAL MODAL -->
+  <div id="modal-auditor" class="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 hidden">
+    <div class="modal-overlay fixed inset-0 bg-slate-900/60 backdrop-blur-sm" onclick="app.closeAuditorModal()"></div>
+
+    <div class="modal-content relative bg-white w-full max-w-4xl max-h-[92vh] rounded-3xl shadow-2xl overflow-y-auto z-10 border border-slate-200">
+      
+      <!-- Auditor Header -->
+      <div class="p-6 bg-gradient-to-r from-teal-950 via-slate-900 to-indigo-950 text-white relative">
+        <button onclick="app.closeAuditorModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+        <div class="flex items-center space-x-2 mb-1">
+          <span class="px-2.5 py-0.5 rounded-full bg-teal-500/20 text-teal-300 text-xs font-bold border border-teal-500/30">
+            <i data-lucide="stethoscope" class="w-3.5 h-3.5 inline mr-1"></i> Authorized Medical Board
+          </span>
+          <span class="text-xs text-slate-300">Hospital Auditor Portal</span>
+        </div>
+        <h3 class="text-2xl font-extrabold tracking-tight">Clinical Document & Disbursement Audit</h3>
+        <p class="text-xs text-slate-300 mt-1 max-w-2xl">
+          Review patient estimates, authenticate doctor prescriptions, approve pending fundraisers, and verify direct hospital tranche payouts.
+        </p>
+      </div>
+
+      <!-- Auditor Content Area -->
+      <div class="p-6 space-y-6" id="auditor-portal-content">
+        <!-- Injected dynamically by app.js -->
+      </div>
+
+    </div>
+  </div>
+
+  <!-- 8. POST CLINICAL UPDATE MODAL -->
+  <div id="modal-post-update" class="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 hidden">
+    <div class="modal-overlay fixed inset-0 bg-slate-900/60 backdrop-blur-sm" onclick="app.closePostUpdateModal()"></div>
+
+    <div class="modal-content relative bg-white w-full max-w-lg rounded-3xl shadow-2xl overflow-hidden z-10 border border-slate-200">
+      <div class="p-6 bg-slate-900 text-white relative">
+        <button onclick="app.closePostUpdateModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+        <span class="text-xs uppercase tracking-wider font-extrabold text-emerald-400">Patient Recovery Timeline</span>
+        <h3 class="text-lg font-bold mt-1">Post a Clinical Progress Update</h3>
+      </div>
+
+      <form id="post-update-form" class="p-6 space-y-4 text-xs">
+        <div>
+          <label class="block font-bold text-slate-700 mb-1">Update Headline *</label>
+          <input type="text" id="update-title" required placeholder="e.g. Surgery successfully performed / Shifted from ICU" class="w-full px-3.5 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-brand-500">
+        </div>
+
+        <div>
+          <label class="block font-bold text-slate-700 mb-1">Author Role *</label>
+          <select id="update-author-role" class="w-full px-3.5 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-brand-500 font-semibold">
+            <option value="Family Organizer">Family Organizer</option>
+            <option value="Attending Surgical Team">Attending Surgical Team / Doctor</option>
+            <option value="Patient (Direct Update)">Patient (Direct Update)</option>
+            <option value="Hospital Social Work Dept">Hospital Social Work Dept</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block font-bold text-slate-700 mb-1">Detailed Clinical Notes & Recovery Details *</label>
+          <textarea id="update-desc" required rows="4" placeholder="Share health vitals, post-op milestones, or doctor comments with donors." class="w-full px-3.5 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-brand-500"></textarea>
+        </div>
+
+        <div class="flex justify-end space-x-2 pt-2 border-t border-slate-100">
+          <button type="button" onclick="app.closePostUpdateModal()" class="px-4 py-2 rounded-xl text-slate-600 bg-slate-100 hover:bg-slate-200 font-bold">
+            Cancel
+          </button>
+          <button type="submit" class="px-5 py-2 rounded-xl text-white bg-brand-600 hover:bg-brand-700 font-bold shadow-md shadow-emerald-600/30">
+            Publish Update
+          </button>
+        </div>
+      </form>
     </div>
   </div>
 
