@@ -7,7 +7,8 @@ const STORAGE_KEYS = {
   DONATIONS: "medical_fund_donations",
   BOOKMARKS: "medical_fund_bookmarks",
   ACTIVE_ROLE: "medical_fund_active_role",
-  CURRENCY: "medical_fund_active_currency"
+  CURRENCY: "medical_fund_active_currency",
+  HOSPITAL_APPLICATIONS: "medical_fund_hospital_apps"
 };
 
 class MedicalFundStorage {
@@ -21,7 +22,6 @@ class MedicalFundStorage {
     if (!existing) {
       localStorage.setItem(STORAGE_KEYS.CAMPAIGNS, JSON.stringify(INITIAL_CAMPAIGNS));
     } else {
-      // Ensure seed campaigns with new schema properties are maintained
       try {
         const parsed = JSON.parse(existing);
         let updated = false;
@@ -48,6 +48,9 @@ class MedicalFundStorage {
     }
     if (!localStorage.getItem(STORAGE_KEYS.BOOKMARKS)) {
       localStorage.setItem(STORAGE_KEYS.BOOKMARKS, JSON.stringify([]));
+    }
+    if (!localStorage.getItem(STORAGE_KEYS.HOSPITAL_APPLICATIONS)) {
+      localStorage.setItem(STORAGE_KEYS.HOSPITAL_APPLICATIONS, JSON.stringify([]));
     }
   }
 
@@ -162,7 +165,6 @@ class MedicalFundStorage {
     if (auditorName) campaign.verificationDetails.auditorName = auditorName;
     if (auditorNotes) campaign.verificationDetails.auditorNotes = auditorNotes;
 
-    // Verify all associated medical documents if approved
     if (isVerified && Array.isArray(campaign.medicalDocuments)) {
       campaign.medicalDocuments.forEach(doc => { doc.verified = true; });
     }
@@ -199,7 +201,7 @@ class MedicalFundStorage {
   }
 
   // Process a donation
-  recordDonation({ campaignId, amount, donorName, email, message, isAnonymous, tipAmount = 0 }) {
+  recordDonation({ campaignId, amount, donorName, email, message, isAnonymous, tipAmount = 0, paymentMethod = "Credit Card", cardLastFour = "4242" }) {
     const campaigns = this.getCampaigns();
     const campaignIndex = campaigns.findIndex(c => c.id === campaignId);
 
@@ -242,6 +244,8 @@ class MedicalFundStorage {
       totalPaid: donationAmount + Number(tipAmount),
       donorName: isAnonymous ? "Anonymous Benefactor" : donorName,
       donorEmail: email,
+      paymentMethod,
+      cardLastFour,
       date: new Date().toISOString(),
       taxDeductibleEligible: true,
       taxExemptionCode: "MED-80G/501C3-" + Math.floor(100000 + Math.random() * 900000)
@@ -291,6 +295,24 @@ class MedicalFundStorage {
     }
     localStorage.setItem(STORAGE_KEYS.BOOKMARKS, JSON.stringify(bookmarks));
     return isNowSaved;
+  }
+
+  // Partner Hospitals
+  getPartnerHospitals() {
+    return PARTNER_HOSPITALS || [];
+  }
+
+  addHospitalApplication(hospitalData) {
+    const apps = JSON.parse(localStorage.getItem(STORAGE_KEYS.HOSPITAL_APPLICATIONS) || "[]");
+    const newApp = {
+      id: "app-hosp-" + Date.now(),
+      date: new Date().toISOString().split("T")[0],
+      status: "Submitted",
+      ...hospitalData
+    };
+    apps.unshift(newApp);
+    localStorage.setItem(STORAGE_KEYS.HOSPITAL_APPLICATIONS, JSON.stringify(apps));
+    return newApp;
   }
 
   // Role switching: "donor" | "hospital_auditor" | "patient_family"

@@ -1,7 +1,8 @@
 /**
  * Main Application Logic for Medical Fund
  * Enhanced with 5-Tab Clinical Architecture, Hospital Auditor Portal,
- * Recovery Updates, Hospital Disbursements Ledger & Bookmark System
+ * Recovery Updates, Hospital Disbursements Ledger, Bookmark System,
+ * Payment Gateway Simulation (Card, UPI QR, Wallets) & Hospital Partner Directory
  */
 
 class MedicalFundApp {
@@ -14,6 +15,7 @@ class MedicalFundApp {
     this.donationTargetCampaign = null;
     this.currentWizardStep = 1;
     this.postUpdateTargetCampaignId = null;
+    this.activePaymentMethod = "card"; // 'card' | 'upi' | 'wallet'
 
     this.init();
   }
@@ -134,28 +136,30 @@ class MedicalFundApp {
       });
     }
 
-    // Start a Fundraiser Open Button
+    // Header buttons
     const btnOpenCreate = document.getElementById("btn-open-create");
     if (btnOpenCreate) {
       btnOpenCreate.addEventListener("click", () => this.openCreateModal());
     }
 
-    // Receipts Button
     const btnReceipts = document.getElementById("btn-view-receipts");
     if (btnReceipts) {
       btnReceipts.addEventListener("click", () => this.openAllReceiptsModal());
     }
 
-    // Bookmarks Button
     const btnBookmarks = document.getElementById("btn-view-bookmarks");
     if (btnBookmarks) {
       btnBookmarks.addEventListener("click", () => this.openBookmarksModal());
     }
 
-    // Hospital Auditor Portal Button
     const btnAuditor = document.getElementById("btn-open-auditor-portal");
     if (btnAuditor) {
       btnAuditor.addEventListener("click", () => this.openAuditorModal());
+    }
+
+    const btnHospitals = document.getElementById("btn-open-hospitals-directory");
+    if (btnHospitals) {
+      btnHospitals.addEventListener("click", () => this.openHospitalsModal());
     }
 
     // Donation Form Submit
@@ -639,10 +643,8 @@ class MedicalFundApp {
 
   // --- Dynamic Tab Content Renderer ---
   renderDetailTabContent(campaign) {
-    // TAB 1: STORY & CLINICAL DIAGNOSIS
     if (this.activeDetailTab === "story") {
       return `
-        <!-- Patient & Clinical Info Matrix -->
         <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 bg-slate-50 p-4 rounded-2xl border border-slate-200 text-xs">
           <div>
             <span class="text-slate-400 block font-medium">Patient Name</span>
@@ -670,7 +672,6 @@ class MedicalFundApp {
           </div>
         </div>
 
-        <!-- Verified Medical Badges -->
         <div class="bg-emerald-50/70 border border-emerald-200 rounded-2xl p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs">
           <div class="flex items-center space-x-3">
             <div class="w-10 h-10 rounded-xl bg-emerald-600 text-white flex items-center justify-center flex-shrink-0">
@@ -686,7 +687,6 @@ class MedicalFundApp {
           </button>
         </div>
 
-        <!-- Story Body -->
         <div>
           <h4 class="text-sm font-extrabold text-slate-900 uppercase tracking-wider mb-3">Patient Story & Appeal</h4>
           <div class="text-sm text-slate-600 leading-relaxed whitespace-pre-line space-y-3">
@@ -694,7 +694,6 @@ class MedicalFundApp {
           </div>
         </div>
 
-        <!-- Cost Allocation Breakdown -->
         <div>
           <h4 class="text-sm font-extrabold text-slate-900 uppercase tracking-wider mb-3">Estimated Cost Allocation</h4>
           <div class="space-y-3">
@@ -718,7 +717,6 @@ class MedicalFundApp {
       `;
     }
 
-    // TAB 2: VERIFIED CLINICAL DOCUMENTS
     if (this.activeDetailTab === "documents") {
       const docs = campaign.medicalDocuments || [];
       return `
@@ -774,7 +772,6 @@ class MedicalFundApp {
       `;
     }
 
-    // TAB 3: RECOVERY TIMELINE & UPDATES
     if (this.activeDetailTab === "updates") {
       const updates = campaign.updates || [];
       return `
@@ -821,7 +818,6 @@ class MedicalFundApp {
       `;
     }
 
-    // TAB 4: DIRECT HOSPITAL DISBURSEMENTS LEDGER
     if (this.activeDetailTab === "disbursements") {
       const disb = campaign.disbursements || [];
       const totalDisbursed = disb.reduce((acc, d) => acc + (d.amount || 0), 0);
@@ -881,7 +877,6 @@ class MedicalFundApp {
       `;
     }
 
-    // TAB 5: DONORS & MESSAGES BOARD
     if (this.activeDetailTab === "donors") {
       const donors = campaign.donors || [];
       return `
@@ -925,7 +920,6 @@ class MedicalFundApp {
     this.activeCampaignId = null;
   }
 
-  // --- Document Inspection Simulated Viewer ---
   showDocumentPreview(title, type, issuedBy, docNumber) {
     alert(`AUDITED MEDICAL DOCUMENT\n\nTitle: ${title}\nType: ${type}\nIssued By: ${issuedBy}\nRegistration Ref: ${docNumber}\nClinical Authenticity: Verified against hospital inpatient database.`);
   }
@@ -996,7 +990,6 @@ class MedicalFundApp {
     if (modal) modal.classList.add("hidden");
   }
 
-  // --- Share Campaign Helper ---
   shareCampaign(campaignId) {
     const campaign = window.storage.getCampaignById(campaignId);
     if (!campaign) return;
@@ -1012,200 +1005,27 @@ class MedicalFundApp {
     }
   }
 
-  // --- Hospital Auditor Portal Modal ---
-  openAuditorModal() {
-    const modal = document.getElementById("modal-auditor");
-    const container = document.getElementById("auditor-portal-content");
-    if (!modal || !container) return;
+  // --- Payment Method Selector in Donation Modal ---
+  setPaymentMethod(method, btnElement) {
+    this.activePaymentMethod = method;
 
-    const campaigns = window.storage.getCampaigns();
-    const stats = window.storage.getPlatformStats();
-    const pendingList = campaigns.filter(c => !c.isVerified || c.verificationStatus?.includes("Pending"));
-    const approvedList = campaigns.filter(c => c.isVerified);
+    document.querySelectorAll(".pay-method-btn").forEach(b => {
+      b.className = "pay-method-btn p-2.5 rounded-xl border border-slate-200 bg-slate-50 text-slate-700 hover:bg-slate-100 text-xs font-bold flex flex-col items-center justify-center space-y-1";
+    });
 
-    container.innerHTML = `
-      <!-- Auditor Summary Metric Cards -->
-      <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        <div class="p-3 bg-slate-50 rounded-2xl border border-slate-200 text-center">
-          <span class="text-slate-400 text-[11px] block">Total Cases</span>
-          <span class="text-lg font-extrabold text-slate-900">${campaigns.length}</span>
-        </div>
-        <div class="p-3 bg-amber-50 rounded-2xl border border-amber-200 text-center">
-          <span class="text-amber-700 text-[11px] block font-bold">Pending Audit</span>
-          <span class="text-lg font-extrabold text-amber-800">${pendingList.length}</span>
-        </div>
-        <div class="p-3 bg-emerald-50 rounded-2xl border border-emerald-200 text-center">
-          <span class="text-emerald-700 text-[11px] block font-bold">Approved & Verified</span>
-          <span class="text-lg font-extrabold text-emerald-800">${approvedList.length}</span>
-        </div>
-        <div class="p-3 bg-slate-50 rounded-2xl border border-slate-200 text-center">
-          <span class="text-slate-400 text-[11px] block">Disbursements</span>
-          <span class="text-lg font-extrabold text-indigo-700">${this.formatAmount(stats.totalRaised * 0.4)}</span>
-        </div>
-      </div>
+    if (btnElement) {
+      btnElement.className = "pay-method-btn p-2.5 rounded-xl border border-brand-600 bg-brand-50 text-brand-700 text-xs font-bold flex flex-col items-center justify-center space-y-1";
+    }
 
-      <!-- Action Section 1: Cases Awaiting Clinical Verification -->
-      <div>
-        <h4 class="text-xs font-extrabold text-slate-900 uppercase tracking-wider mb-3 flex items-center">
-          <span class="w-2.5 h-2.5 rounded-full bg-amber-500 mr-2 animate-pulse"></span>
-          Pending Clinical Review Queue (${pendingList.length})
-        </h4>
+    const cardSec = document.getElementById("pay-card-section");
+    const upiSec = document.getElementById("pay-upi-section");
+    const walletSec = document.getElementById("pay-wallet-section");
 
-        ${pendingList.length === 0 ? `
-          <div class="p-4 text-center bg-slate-50 rounded-2xl border border-slate-200 text-xs text-slate-500">
-            All submitted campaigns are currently audited and verified!
-          </div>
-        ` : `
-          <div class="space-y-3">
-            ${pendingList.map(c => `
-              <div class="p-4 bg-amber-50/50 rounded-2xl border border-amber-200 text-xs space-y-3">
-                <div class="flex items-start justify-between">
-                  <div>
-                    <span class="font-extrabold text-slate-900 text-sm">${c.patientName} (${c.patientAge}y)</span>
-                    <div class="text-[11px] text-slate-600 font-medium">${c.condition} • ${c.hospital}</div>
-                    <div class="text-[10px] text-amber-800 italic mt-0.5">${c.verificationDetails?.auditorNotes || 'Awaiting document cross-verification'}</div>
-                  </div>
-                  <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-100 text-amber-800">
-                    Needs Sign-off
-                  </span>
-                </div>
+    if (cardSec) cardSec.classList.toggle("hidden", method !== "card");
+    if (upiSec) upiSec.classList.toggle("hidden", method !== "upi");
+    if (walletSec) walletSec.classList.toggle("hidden", method !== "wallet");
 
-                <div class="flex items-center justify-between pt-2 border-t border-amber-200/70">
-                  <span class="text-[11px] font-semibold text-slate-600">Goal: ${this.formatAmount(c.goalAmount)}</span>
-                  <div class="flex space-x-2">
-                    <button onclick="app.approveCampaignAsAuditor('${c.id}')" class="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-sm">
-                      ✓ Approve & Verify
-                    </button>
-                  </div>
-                </div>
-              </div>
-            `).join("")}
-          </div>
-        `}
-      </div>
-
-      <!-- Action Section 2: Direct Hospital Payout Trigger -->
-      <div class="pt-4 border-t border-slate-200">
-        <h4 class="text-xs font-extrabold text-slate-900 uppercase tracking-wider mb-3">
-          Execute Audited Hospital Payout Tranche
-        </h4>
-        <form onsubmit="app.handleDisbursementSubmit(event)" class="grid grid-cols-1 sm:grid-cols-4 gap-3 bg-slate-50 p-4 rounded-2xl border border-slate-200 text-xs">
-          <div>
-            <label class="block font-bold text-slate-700 mb-1">Select Case</label>
-            <select id="disb-campaign-id" class="w-full px-2 py-1.5 bg-white border border-slate-200 rounded-lg text-xs" required>
-              ${campaigns.map(c => `<option value="${c.id}">${c.patientName} (${c.hospital.split(',')[0]})</option>`).join("")}
-            </select>
-          </div>
-          <div>
-            <label class="block font-bold text-slate-700 mb-1">Tranche Purpose</label>
-            <input type="text" id="disb-purpose" placeholder="e.g. ICU Bed Charges / Stents" class="w-full px-2 py-1.5 bg-white border border-slate-200 rounded-lg text-xs" required>
-          </div>
-          <div>
-            <label class="block font-bold text-slate-700 mb-1">Amount ($ USD)</label>
-            <input type="number" id="disb-amount" min="100" placeholder="e.g. 5000" class="w-full px-2 py-1.5 bg-white border border-slate-200 rounded-lg text-xs font-bold" required>
-          </div>
-          <div class="flex items-end">
-            <button type="submit" class="w-full py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-lg text-xs transition-colors shadow-sm">
-              Disburse to Hospital
-            </button>
-          </div>
-        </form>
-      </div>
-    `;
-
-    modal.classList.remove("hidden");
     if (window.lucide) window.lucide.createIcons();
-  }
-
-  closeAuditorModal() {
-    const modal = document.getElementById("modal-auditor");
-    if (modal) modal.classList.add("hidden");
-  }
-
-  approveCampaignAsAuditor(campaignId) {
-    window.storage.updateCampaignVerification(campaignId, {
-      isVerified: true,
-      status: "Approved & Audited",
-      auditorName: "Dr. Arvind Mehta (Chief Clinical Officer)",
-      auditorNotes: "Clinical documents and hospital bed quota verified with administrative desk."
-    });
-
-    this.renderCampaigns();
-    this.renderUrgentCampaigns();
-    this.updateAuditorBadges();
-    this.openAuditorModal(); // Refresh modal view
-    this.showToast("Campaign approved with official Hospital Verified badge!");
-  }
-
-  handleDisbursementSubmit(event) {
-    event.preventDefault();
-    const campaignId = document.getElementById("disb-campaign-id")?.value;
-    const purpose = document.getElementById("disb-purpose")?.value.trim();
-    const amount = Number(document.getElementById("disb-amount")?.value);
-
-    if (!campaignId || !purpose || !amount) return;
-
-    window.storage.recordDisbursement(campaignId, {
-      purpose,
-      amount,
-      hospitalAccount: "HOSPITAL-AUDITED-ESCROW-2026",
-      wireReference: "FEDWIRE-" + Math.floor(10000000 + Math.random() * 90000000)
-    });
-
-    this.openAuditorModal();
-    this.showToast(`Tranche of ${this.formatAmount(amount)} wired directly to hospital!`);
-  }
-
-  updateAuditorBadges() {
-    const pendingCount = window.storage.getPlatformStats().pendingReviewCount;
-    const badge1 = document.getElementById("pending-audits-badge");
-    const badge2 = document.getElementById("mobile-pending-badge");
-
-    if (badge1) {
-      badge1.textContent = pendingCount;
-      badge1.classList.toggle("hidden", pendingCount === 0);
-    }
-    if (badge2) {
-      badge2.textContent = `${pendingCount} Audit Cases`;
-    }
-  }
-
-  // --- Post Clinical Update Modal ---
-  openPostUpdateModal(campaignId) {
-    this.postUpdateTargetCampaignId = campaignId;
-    const modal = document.getElementById("modal-post-update");
-    if (modal) modal.classList.remove("hidden");
-  }
-
-  closePostUpdateModal() {
-    const modal = document.getElementById("modal-post-update");
-    if (modal) modal.classList.add("hidden");
-    this.postUpdateTargetCampaignId = null;
-  }
-
-  handlePostUpdateSubmit(event) {
-    event.preventDefault();
-    if (!this.postUpdateTargetCampaignId) return;
-
-    const title = document.getElementById("update-title")?.value.trim();
-    const authorRole = document.getElementById("update-author-role")?.value;
-    const description = document.getElementById("update-desc")?.value.trim();
-
-    if (!title || !description) return;
-
-    window.storage.addCampaignUpdate(this.postUpdateTargetCampaignId, {
-      title,
-      authorRole,
-      description
-    });
-
-    this.closePostUpdateModal();
-
-    if (this.activeCampaignId === this.postUpdateTargetCampaignId) {
-      this.openDetailModal(this.activeCampaignId, "updates");
-    }
-
-    this.showToast("Recovery update posted to campaign timeline!");
   }
 
   // --- Donation Modal Logic ---
@@ -1214,6 +1034,7 @@ class MedicalFundApp {
     if (!campaign) return;
 
     this.donationTargetCampaign = campaign;
+    this.activePaymentMethod = "card";
 
     const modal = document.getElementById("modal-donate");
     const titleEl = document.getElementById("donate-modal-title");
@@ -1224,6 +1045,9 @@ class MedicalFundApp {
 
     this.setupDonationPresets();
     this.calculateDonationTotal();
+
+    const overlay = document.getElementById("payment-processing-overlay");
+    if (overlay) overlay.classList.add("hidden");
 
     if (modal) modal.classList.remove("hidden");
     if (window.lucide) window.lucide.createIcons();
@@ -1242,7 +1066,7 @@ class MedicalFundApp {
 
     grid.innerHTML = baseAmounts.map((base, idx) => {
       const converted = Math.round(base * config.rate);
-      const isDefault = idx === 1; // 50 is default
+      const isDefault = idx === 1;
       return `
         <button 
           type="button" 
@@ -1320,39 +1144,83 @@ class MedicalFundApp {
     const donorMessage = document.getElementById("donor-message")?.value.trim();
     const isAnonymous = document.getElementById("donor-anonymous")?.checked || false;
 
-    try {
-      const result = window.storage.recordDonation({
-        campaignId: this.donationTargetCampaign.id,
-        amount: Math.round(baseUSD),
-        donorName,
-        email: donorEmail,
-        message: donorMessage,
-        isAnonymous,
-        tipAmount: Math.round(tipUSD)
-      });
-
-      this.closeDonateModal();
-      this.fireConfetti();
-      this.showReceiptModal(result.receipt);
-
-      this.renderCampaigns();
-      this.renderUrgentCampaigns();
-      this.updatePlatformStats();
-      this.updateReceiptCount();
-
-      this.showToast(`Thank you! Donation of ${this.formatAmount(baseUSD)} received!`);
-    } catch (e) {
-      alert("Failed to record donation: " + e.message);
+    // Determine payment label
+    let paymentMethodLabel = "Credit Card (•• 4242)";
+    let cardLastFour = "4242";
+    if (this.activePaymentMethod === "upi") {
+      paymentMethodLabel = "UPI Direct Escrow (Ref: UPI-9921)";
+      cardLastFour = "UPI";
+    } else if (this.activePaymentMethod === "wallet") {
+      paymentMethodLabel = "Apple Pay / Google Pay";
+      cardLastFour = "WALLET";
     }
+
+    // Show simulated 3-phase payment processing overlay
+    const overlay = document.getElementById("payment-processing-overlay");
+    const progressTitle = document.getElementById("processing-title");
+    const progressSub = document.getElementById("processing-subtitle");
+    const progressBar = document.getElementById("processing-progress-bar");
+
+    if (overlay) {
+      overlay.classList.remove("hidden");
+      if (progressTitle) progressTitle.textContent = "Securing 256-bit SSL Connection...";
+      if (progressSub) progressSub.textContent = `Connecting to ${this.donationTargetCampaign.hospital.split(',')[0]} Escrow Desk...`;
+      if (progressBar) progressBar.style.width = "35%";
+    }
+
+    // Phase 1 -> Phase 2
+    setTimeout(() => {
+      if (progressTitle) progressTitle.textContent = "Clearing Direct Hospital Escrow...";
+      if (progressSub) progressSub.textContent = "Anti-diversion protocols verified. Authorizing payment settlement...";
+      if (progressBar) progressBar.style.width = "75%";
+
+      // Phase 2 -> Phase 3 Completion
+      setTimeout(() => {
+        if (progressTitle) progressTitle.textContent = "Payment Cleared! Generating 80G Tax Receipt...";
+        if (progressBar) progressBar.style.width = "100%";
+
+        setTimeout(() => {
+          try {
+            const result = window.storage.recordDonation({
+              campaignId: this.donationTargetCampaign.id,
+              amount: Math.round(baseUSD),
+              donorName,
+              email: donorEmail,
+              message: donorMessage,
+              isAnonymous,
+              tipAmount: Math.round(tipUSD),
+              paymentMethod: paymentMethodLabel,
+              cardLastFour
+            });
+
+            this.closeDonateModal();
+            this.fireConfetti();
+            this.showReceiptModal(result.receipt);
+
+            this.renderCampaigns();
+            this.renderUrgentCampaigns();
+            this.updatePlatformStats();
+            this.updateReceiptCount();
+
+            this.showToast(`Thank you! Life-saving donation of ${this.formatAmount(baseUSD)} confirmed!`);
+          } catch (e) {
+            alert("Failed to record donation: " + e.message);
+          }
+        }, 600);
+
+      }, 700);
+
+    }, 700);
   }
 
   closeDonateModal() {
     const modal = document.getElementById("modal-donate");
     if (modal) modal.classList.add("hidden");
+    const overlay = document.getElementById("payment-processing-overlay");
+    if (overlay) overlay.classList.add("hidden");
     this.donationTargetCampaign = null;
   }
 
-  // --- Confetti Celebration ---
   fireConfetti() {
     if (typeof confetti === 'function') {
       confetti({
@@ -1363,7 +1231,6 @@ class MedicalFundApp {
     }
   }
 
-  // --- Receipt Modal ---
   showReceiptModal(receipt) {
     const modal = document.getElementById("modal-receipt");
     if (!modal) return;
@@ -1372,6 +1239,8 @@ class MedicalFundApp {
     document.getElementById("receipt-patient").textContent = receipt.patientName;
     document.getElementById("receipt-hospital").textContent = receipt.hospital;
     document.getElementById("receipt-donor").textContent = receipt.donorName;
+    const payMethodEl = document.getElementById("receipt-payment-method");
+    if (payMethodEl) payMethodEl.textContent = receipt.paymentMethod || "Credit Card (•• 4242)";
     document.getElementById("receipt-date").textContent = new Date(receipt.date).toLocaleDateString('en-US', {
       year: 'numeric',
       month: 'long',
@@ -1389,7 +1258,6 @@ class MedicalFundApp {
     if (modal) modal.classList.add("hidden");
   }
 
-  // --- All User Receipts Modal ---
   openAllReceiptsModal() {
     const modal = document.getElementById("modal-all-receipts");
     const container = document.getElementById("all-receipts-list");
@@ -1436,6 +1304,280 @@ class MedicalFundApp {
     if (countEl) {
       countEl.textContent = window.storage.getAllDonations().length;
     }
+  }
+
+  // --- Partner Hospitals Directory Modal ---
+  openHospitalsModal() {
+    const modal = document.getElementById("modal-hospitals");
+    const grid = document.getElementById("hospitals-directory-grid");
+    if (!modal || !grid) return;
+
+    const hospitals = window.storage.getPartnerHospitals();
+
+    grid.innerHTML = hospitals.map(h => `
+      <div class="p-4 bg-white rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between space-y-3">
+        <div class="flex items-start space-x-3">
+          <img src="${h.image}" alt="${h.name}" class="w-16 h-16 rounded-xl object-cover flex-shrink-0 shadow-sm" onerror="this.src='https://images.unsplash.com/photo-1586773860418-d37222d8fce3?auto=format&fit=crop&w=300&q=80'">
+          <div>
+            <h4 class="font-bold text-slate-900 text-sm leading-snug">${h.name}</h4>
+            <div class="text-[11px] text-slate-500 flex items-center mt-0.5">
+              <i data-lucide="map-pin" class="w-3 h-3 mr-1 text-slate-400"></i> ${h.city}
+            </div>
+            <span class="inline-block mt-1 px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+              ${h.accreditation}
+            </span>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-2 text-[11px] pt-2 border-t border-slate-100 text-slate-600">
+          <div>
+            <span class="text-slate-400 block">Bed Capacity:</span>
+            <span class="font-bold text-slate-800">${h.bedCapacity} Total (${h.icuBeds} ICU)</span>
+          </div>
+          <div>
+            <span class="text-slate-400 block">Escrow Desk:</span>
+            <span class="font-mono text-emerald-700 text-[10px]">${h.escrowAccountRef}</span>
+          </div>
+        </div>
+
+        <div class="flex flex-wrap gap-1 text-[10px]">
+          ${h.specialties.map(s => `<span class="bg-slate-100 text-slate-700 px-2 py-0.5 rounded-md font-medium">${s}</span>`).join("")}
+        </div>
+      </div>
+    `).join("");
+
+    modal.classList.remove("hidden");
+    if (window.lucide) window.lucide.createIcons();
+  }
+
+  closeHospitalsModal() {
+    const modal = document.getElementById("modal-hospitals");
+    if (modal) modal.classList.add("hidden");
+  }
+
+  openHospitalOnboardingForm() {
+    const modal = document.getElementById("modal-hospital-onboarding");
+    if (modal) modal.classList.remove("hidden");
+  }
+
+  closeHospitalOnboardingForm() {
+    const modal = document.getElementById("modal-hospital-onboarding");
+    if (modal) modal.classList.add("hidden");
+  }
+
+  handleHospitalOnboardingSubmit(event) {
+    event.preventDefault();
+    const name = document.getElementById("onboard-hosp-name")?.value.trim();
+    const city = document.getElementById("onboard-hosp-city")?.value.trim();
+    const accreditation = document.getElementById("onboard-hosp-accred")?.value.trim();
+    const bedCapacity = Number(document.getElementById("onboard-hosp-beds")?.value) || 200;
+    const escrowAccountRef = document.getElementById("onboard-hosp-bank")?.value.trim();
+    const email = document.getElementById("onboard-hosp-email")?.value.trim();
+
+    window.storage.addHospitalApplication({
+      name,
+      city,
+      accreditation,
+      bedCapacity,
+      escrowAccountRef,
+      email
+    });
+
+    this.closeHospitalOnboardingForm();
+    this.showToast("Hospital registration submitted to clinical advisory board!");
+  }
+
+  // --- Hospital Auditor Portal Modal ---
+  openAuditorModal() {
+    const modal = document.getElementById("modal-auditor");
+    const container = document.getElementById("auditor-portal-content");
+    if (!modal || !container) return;
+
+    const campaigns = window.storage.getCampaigns();
+    const stats = window.storage.getPlatformStats();
+    const pendingList = campaigns.filter(c => !c.isVerified || c.verificationStatus?.includes("Pending"));
+    const approvedList = campaigns.filter(c => c.isVerified);
+
+    container.innerHTML = `
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        <div class="p-3 bg-slate-50 rounded-2xl border border-slate-200 text-center">
+          <span class="text-slate-400 text-[11px] block">Total Cases</span>
+          <span class="text-lg font-extrabold text-slate-900">${campaigns.length}</span>
+        </div>
+        <div class="p-3 bg-amber-50 rounded-2xl border border-amber-200 text-center">
+          <span class="text-amber-700 text-[11px] block font-bold">Pending Audit</span>
+          <span class="text-lg font-extrabold text-amber-800">${pendingList.length}</span>
+        </div>
+        <div class="p-3 bg-emerald-50 rounded-2xl border border-emerald-200 text-center">
+          <span class="text-emerald-700 text-[11px] block font-bold">Approved & Verified</span>
+          <span class="text-lg font-extrabold text-emerald-800">${approvedList.length}</span>
+        </div>
+        <div class="p-3 bg-slate-50 rounded-2xl border border-slate-200 text-center">
+          <span class="text-slate-400 text-[11px] block">Disbursements</span>
+          <span class="text-lg font-extrabold text-indigo-700">${this.formatAmount(stats.totalRaised * 0.4)}</span>
+        </div>
+      </div>
+
+      <div>
+        <h4 class="text-xs font-extrabold text-slate-900 uppercase tracking-wider mb-3 flex items-center">
+          <span class="w-2.5 h-2.5 rounded-full bg-amber-500 mr-2 animate-pulse"></span>
+          Pending Clinical Review Queue (${pendingList.length})
+        </h4>
+
+        ${pendingList.length === 0 ? `
+          <div class="p-4 text-center bg-slate-50 rounded-2xl border border-slate-200 text-xs text-slate-500">
+            All submitted campaigns are currently audited and verified!
+          </div>
+        ` : `
+          <div class="space-y-3">
+            ${pendingList.map(c => `
+              <div class="p-4 bg-amber-50/50 rounded-2xl border border-amber-200 text-xs space-y-3">
+                <div class="flex items-start justify-between">
+                  <div>
+                    <span class="font-extrabold text-slate-900 text-sm">${c.patientName} (${c.patientAge}y)</span>
+                    <div class="text-[11px] text-slate-600 font-medium">${c.condition} • ${c.hospital}</div>
+                    <div class="text-[10px] text-amber-800 italic mt-0.5">${c.verificationDetails?.auditorNotes || 'Awaiting document cross-verification'}</div>
+                  </div>
+                  <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-100 text-amber-800">
+                    Needs Sign-off
+                  </span>
+                </div>
+
+                <div class="flex items-center justify-between pt-2 border-t border-amber-200/70">
+                  <span class="text-[11px] font-semibold text-slate-600">Goal: ${this.formatAmount(c.goalAmount)}</span>
+                  <div class="flex space-x-2">
+                    <button onclick="app.approveCampaignAsAuditor('${c.id}')" class="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-sm">
+                      ✓ Approve & Verify
+                    </button>
+                  </div>
+                </div>
+              </div>
+            `).join("")}
+          </div>
+        `}
+      </div>
+
+      <div class="pt-4 border-t border-slate-200">
+        <h4 class="text-xs font-extrabold text-slate-900 uppercase tracking-wider mb-3">
+          Execute Audited Hospital Payout Tranche
+        </h4>
+        <form onsubmit="app.handleDisbursementSubmit(event)" class="grid grid-cols-1 sm:grid-cols-4 gap-3 bg-slate-50 p-4 rounded-2xl border border-slate-200 text-xs">
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">Select Case</label>
+            <select id="disb-campaign-id" class="w-full px-2 py-1.5 bg-white border border-slate-200 rounded-lg text-xs" required>
+              ${campaigns.map(c => `<option value="${c.id}">${c.patientName} (${c.hospital.split(',')[0]})</option>`).join("")}
+            </select>
+          </div>
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">Tranche Purpose</label>
+            <input type="text" id="disb-purpose" placeholder="e.g. ICU Bed Charges / Stents" class="w-full px-2 py-1.5 bg-white border border-slate-200 rounded-lg text-xs" required>
+          </div>
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">Amount ($ USD)</label>
+            <input type="number" id="disb-amount" min="100" placeholder="e.g. 5000" class="w-full px-2 py-1.5 bg-white border border-slate-200 rounded-lg text-xs font-bold" required>
+          </div>
+          <div class="flex items-end">
+            <button type="submit" class="w-full py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-lg text-xs transition-colors shadow-sm">
+              Disburse to Hospital
+            </button>
+          </div>
+        </form>
+      </div>
+    `;
+
+    modal.classList.remove("hidden");
+    if (window.lucide) window.lucide.createIcons();
+  }
+
+  closeAuditorModal() {
+    const modal = document.getElementById("modal-auditor");
+    if (modal) modal.classList.add("hidden");
+  }
+
+  approveCampaignAsAuditor(campaignId) {
+    window.storage.updateCampaignVerification(campaignId, {
+      isVerified: true,
+      status: "Approved & Audited",
+      auditorName: "Dr. Arvind Mehta (Chief Clinical Officer)",
+      auditorNotes: "Clinical documents and hospital bed quota verified with administrative desk."
+    });
+
+    this.renderCampaigns();
+    this.renderUrgentCampaigns();
+    this.updateAuditorBadges();
+    this.openAuditorModal();
+    this.showToast("Campaign approved with official Hospital Verified badge!");
+  }
+
+  handleDisbursementSubmit(event) {
+    event.preventDefault();
+    const campaignId = document.getElementById("disb-campaign-id")?.value;
+    const purpose = document.getElementById("disb-purpose")?.value.trim();
+    const amount = Number(document.getElementById("disb-amount")?.value);
+
+    if (!campaignId || !purpose || !amount) return;
+
+    window.storage.recordDisbursement(campaignId, {
+      purpose,
+      amount,
+      hospitalAccount: "HOSPITAL-AUDITED-ESCROW-2026",
+      wireReference: "FEDWIRE-" + Math.floor(10000000 + Math.random() * 90000000)
+    });
+
+    this.openAuditorModal();
+    this.showToast(`Tranche of ${this.formatAmount(amount)} wired directly to hospital!`);
+  }
+
+  updateAuditorBadges() {
+    const pendingCount = window.storage.getPlatformStats().pendingReviewCount;
+    const badge1 = document.getElementById("pending-audits-badge");
+    const badge2 = document.getElementById("mobile-pending-badge");
+
+    if (badge1) {
+      badge1.textContent = pendingCount;
+      badge1.classList.toggle("hidden", pendingCount === 0);
+    }
+    if (badge2) {
+      badge2.textContent = `${pendingCount} Audit Cases`;
+    }
+  }
+
+  // --- Post Clinical Update Modal ---
+  openPostUpdateModal(campaignId) {
+    this.postUpdateTargetCampaignId = campaignId;
+    const modal = document.getElementById("modal-post-update");
+    if (modal) modal.classList.remove("hidden");
+  }
+
+  closePostUpdateModal() {
+    const modal = document.getElementById("modal-post-update");
+    if (modal) modal.classList.add("hidden");
+    this.postUpdateTargetCampaignId = null;
+  }
+
+  handlePostUpdateSubmit(event) {
+    event.preventDefault();
+    if (!this.postUpdateTargetCampaignId) return;
+
+    const title = document.getElementById("update-title")?.value.trim();
+    const authorRole = document.getElementById("update-author-role")?.value;
+    const description = document.getElementById("update-desc")?.value.trim();
+
+    if (!title || !description) return;
+
+    window.storage.addCampaignUpdate(this.postUpdateTargetCampaignId, {
+      title,
+      authorRole,
+      description
+    });
+
+    this.closePostUpdateModal();
+
+    if (this.activeCampaignId === this.postUpdateTargetCampaignId) {
+      this.openDetailModal(this.activeCampaignId, "updates");
+    }
+
+    this.showToast("Recovery update posted to campaign timeline!");
   }
 
   // --- Fundraiser Creation Multi-Step Wizard ---

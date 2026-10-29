@@ -471,3 +471,68 @@ const CURRENCIES = {
   EUR: { symbol: "€", code: "EUR", rate: 0.92, label: "EUR (€)" },
   GBP: { symbol: "£", code: "GBP", rate: 0.77, label: "GBP (£)" }
 ];
+
+
+// Affiliated Partner Hospitals Directory
+const PARTNER_HOSPITALS = [
+  {
+    id: "hosp-1",
+    name: "Fortis Escorts Heart Institute",
+    city: "New Delhi, India",
+    specialties: ["Pediatric Cardiology", "Intracardiac Repair", "Adult Heart Transplant"],
+    accreditation: "JCI & NABH Accredited",
+    bedCapacity: 310,
+    icuBeds: 92,
+    escrowAccountRef: "HDFC-FORTIS-ESCORTS-0092",
+    contactDesk: "+91 (11) 4713-5000",
+    image: "https://images.unsplash.com/photo-1586773860418-d37222d8fce3?auto=format&fit=crop&w=600&q=80"
+  },
+  {
+    id: "hosp-2",
+    name: "Memorial Sloan Kettering Cancer Center",
+    city: "New York, NY, USA",
+    specialties: ["Medical Oncology", "CAR-T Immunotherapy", "Bone Marrow Transplant"],
+    accreditation: "NCI Comprehensive Cancer Center",
+    bedCapacity: 514,
+    icuBeds: 120,
+    escrowAccountRef: "CHASE-MSK-ONCOLOGY-771",
+    contactDesk: "+1 (212) 639-2000",
+    image: "https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?auto=format&fit=crop&w=600&q=80"
+  },
+  {
+    id: "hosp-3",
+    name: "St. Jude Metropolitan Trauma Center",
+    city: "Boston, MA, USA",
+    specialties: ["Neuro-Trauma Surgery", "Critical Care Medicine", "Emergency Polytrauma"],
+    accreditation: "Level 1 Trauma Verified",
+    bedCapacity: 450,
+    icuBeds: 110,
+    escrowAccountRef: "BOA-STJUDE-TRAUMA-991",
+    contactDesk: "+1 (617) 726-2000",
+    image: "https://images.unsplash.com/photo-1516549655169-df83a0774514?auto=format&fit=crop&w=600&q=80"
+  },
+  {
+    id: "hosp-4",
+    name: "Children's National Hospital",
+    city: "Washington, DC, USA",
+    specialties: ["Pediatric Rare Diseases", "Gene Replacement Therapy", "Pediatric Surgery"],
+    accreditation: "Magnet Recognized & US News Top 10",
+    bedCapacity: 323,
+    icuBeds: 85,
+    escrowAccountRef: "WELLS-CNH-GENETICS-102",
+    contactDesk: "+1 (202) 476-5000",
+    image: "https://images.unsplash.com/photo-1538108149393-fbbd81895907?auto=format&fit=crop&w=600&q=80"
+  },
+  {
+    id: "hosp-5",
+    name: "Medanta - The Medicity",
+    city: "Gurugram, India",
+    specialties: ["Living Donor Liver Transplant", "Renal Sciences", "Robotic Surgery"],
+    accreditation: "JCI Accredited & NABH Certified",
+    bedCapacity: 1250,
+    icuBeds: 350,
+    escrowAccountRef: "ICICI-MEDANTA-TRANS-0012",
+    contactDesk: "+91 (124) 414-1414",
+    image: "https://images.unsplash.com/photo-1584515933487-779824d29309?auto=format&fit=crop&w=600&q=80"
+  }
+];
