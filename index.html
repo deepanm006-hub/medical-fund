@@ -1,0 +1,964 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Medical Fund | Trusted Healthcare Crowdfunding & Patient Relief</title>
+  <meta name="description" content="Verified medical crowdfunding platform for critical treatments, emergency surgeries, and pediatric healthcare. Direct hospital disbursement with 0% platform fee.">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'system-ui', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              50: '#ecfdf5',
+              100: '#d1fae5',
+              200: '#a7f3d0',
+              500: '#10b981',
+              600: '#059669',
+              700: '#047857',
+              800: '#065f46',
+              900: '#064e3b'
+            },
+            tealbrand: {
+              500: '#14b8a6',
+              600: '#0d9488',
+              700: '#0f766e',
+            },
+            urgent: {
+              50: '#fff1f2',
+              100: '#ffe4e6',
+              500: '#f43f5e',
+              600: '#e11d48',
+              700: '#be123c'
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <!-- Canvas Confetti -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+  <!-- Custom Styles -->
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans antialiased selection:bg-brand-500 selection:text-white min-h-screen flex flex-col">
+
+  <!-- ================= TOP NOTIFICATION BAR ================= -->
+  <div class="bg-gradient-to-r from-teal-900 via-slate-900 to-emerald-950 text-slate-200 text-xs sm:text-sm py-2 px-4 border-b border-teal-800/40">
+    <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-2">
+      <div class="flex items-center space-x-2">
+        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+          <i data-lucide="shield-check" class="w-3.5 h-3.5 mr-1"></i> 100% Verified
+        </span>
+        <span class="hidden sm:inline text-slate-300">Direct hospital disbursement — Every bill audited by certified clinical partners.</span>
+        <span class="sm:hidden text-slate-300">Audited clinical disbursements.</span>
+      </div>
+      <div class="flex items-center space-x-4">
+        <!-- Currency Selector -->
+        <div class="flex items-center space-x-1.5">
+          <span class="text-slate-400 text-xs">Currency:</span>
+          <select id="currency-select" class="bg-slate-800/90 text-slate-200 text-xs font-medium rounded-md px-2 py-1 border border-slate-700 focus:outline-none focus:border-brand-500">
+            <option value="USD">USD ($)</option>
+            <option value="INR">INR (₹)</option>
+            <option value="EUR">EUR (€)</option>
+            <option value="GBP">GBP (£)</option>
+          </select>
+        </div>
+        <button id="btn-view-receipts" class="hover:text-emerald-300 transition-colors flex items-center space-x-1 text-xs font-medium">
+          <i data-lucide="receipt" class="w-3.5 h-3.5"></i>
+          <span>My Receipts (<span id="my-receipts-count">0</span>)</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= HEADER & NAV ================= -->
+  <header class="sticky top-0 z-40 glass-header border-b border-slate-200/80 shadow-sm transition-all duration-300">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+      
+      <!-- Logo -->
+      <a href="#" class="flex items-center space-x-3 group">
+        <div class="w-11 h-11 rounded-2xl bg-gradient-to-tr from-brand-600 to-tealbrand-500 flex items-center justify-center text-white shadow-md shadow-emerald-500/20 group-hover:scale-105 transition-transform">
+          <i data-lucide="heart-pulse" class="w-6 h-6"></i>
+        </div>
+        <div>
+          <span class="text-xl font-extrabold tracking-tight text-slate-900 group-hover:text-brand-600 transition-colors">
+            Medical<span class="text-brand-600">Fund</span>
+          </span>
+          <span class="block text-[10px] font-semibold tracking-wider text-slate-400 uppercase -mt-1">Healthcare Relief</span>
+        </div>
+      </a>
+
+      <!-- Desktop Nav -->
+      <nav class="hidden md:flex items-center space-x-8 text-sm font-semibold text-slate-600">
+        <a href="#campaigns-section" class="hover:text-brand-600 transition-colors flex items-center space-x-1">
+          <span>Explore Causes</span>
+        </a>
+        <a href="#urgent-section" class="hover:text-urgent-600 transition-colors flex items-center space-x-1 text-urgent-600 font-bold">
+          <span class="relative flex h-2 w-2 mr-1">
+            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-urgent-500 opacity-75"></span>
+            <span class="relative inline-flex rounded-full h-2 w-2 bg-urgent-600"></span>
+          </span>
+          <span>Emergency Relief</span>
+        </a>
+        <a href="#verification-section" class="hover:text-brand-600 transition-colors">How It Works</a>
+        <a href="#impact-stats" class="hover:text-brand-600 transition-colors">Impact & Trust</a>
+      </nav>
+
+      <!-- CTA Action -->
+      <div class="flex items-center space-x-3">
+        <button id="btn-open-create" class="inline-flex items-center px-4 py-2.5 rounded-xl font-bold text-sm text-white bg-gradient-to-r from-brand-600 to-tealbrand-600 hover:from-brand-700 hover:to-tealbrand-700 shadow-md shadow-emerald-600/25 hover:shadow-lg hover:shadow-emerald-600/35 transition-all transform hover:-translate-y-0.5 active:translate-y-0">
+          <i data-lucide="plus-circle" class="w-4 h-4 mr-2"></i>
+          <span>Start a Fundraiser</span>
+        </button>
+
+        <!-- Mobile Menu Toggle Button -->
+        <button id="mobile-menu-btn" class="md:hidden p-2 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-100 focus:outline-none">
+          <i data-lucide="menu" class="w-6 h-6"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Mobile Nav Drawer -->
+    <div id="mobile-menu" class="hidden md:hidden border-t border-slate-200 bg-white px-4 pt-3 pb-6 space-y-3 text-sm font-semibold text-slate-700 shadow-lg">
+      <a href="#campaigns-section" class="block py-2 hover:text-brand-600 mobile-nav-link">Explore Causes</a>
+      <a href="#urgent-section" class="block py-2 text-urgent-600 font-bold mobile-nav-link">Emergency Relief Cases</a>
+      <a href="#verification-section" class="block py-2 hover:text-brand-600 mobile-nav-link">How Verification Works</a>
+      <a href="#impact-stats" class="block py-2 hover:text-brand-600 mobile-nav-link">Impact & Trust</a>
+    </div>
+  </header>
+
+  <!-- ================= HERO SECTION ================= -->
+  <section class="relative overflow-hidden bg-gradient-to-b from-emerald-50/60 via-slate-50 to-white pt-12 pb-16 lg:pt-20 lg:pb-24 border-b border-slate-200/60">
+    <!-- Background Glow Blobs -->
+    <div class="absolute -top-24 left-1/2 -translate-x-1/2 w-[700px] h-[350px] bg-gradient-to-r from-emerald-200/40 via-teal-100/50 to-sky-200/40 blur-3xl -z-10 pointer-events-none rounded-full"></div>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+        
+        <!-- Left Hero Copy -->
+        <div class="lg:col-span-7 space-y-6 text-center lg:text-left">
+          <div class="inline-flex items-center space-x-2 px-3 py-1.5 rounded-full bg-emerald-100/80 text-emerald-800 text-xs font-bold border border-emerald-300">
+            <span class="flex h-2 w-2 rounded-full bg-emerald-600"></span>
+            <span>Zero Platform Fees for Patients • Direct Hospital Settlement</span>
+          </div>
+
+          <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-slate-900 tracking-tight leading-[1.15]">
+            Give Hope. Save Lives.<br>
+            <span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-600 via-tealbrand-600 to-indigo-600">
+              Verified Medical Crowdfunding.
+            </span>
+          </h1>
+
+          <p class="text-base sm:text-lg text-slate-600 max-w-2xl leading-relaxed">
+            When life-threatening illnesses strike, families shouldn't have to face bankruptcy. MedicalFund connects vulnerable patients directly with compassionate donors, guaranteeing verified doctor notes and direct disbursements.
+          </p>
+
+          <!-- Action Buttons -->
+          <div class="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 pt-2">
+            <a href="#urgent-section" class="w-full sm:w-auto inline-flex items-center justify-center px-6 py-3.5 rounded-xl text-base font-bold text-white bg-urgent-600 hover:bg-urgent-700 shadow-lg shadow-rose-600/30 transition-all transform hover:-translate-y-0.5">
+              <i data-lucide="flame" class="w-5 h-5 mr-2"></i>
+              <span>Donate to Urgent Cases</span>
+            </a>
+            <button onclick="document.getElementById('btn-open-create').click()" class="w-full sm:w-auto inline-flex items-center justify-center px-6 py-3.5 rounded-xl text-base font-bold text-slate-700 bg-white hover:bg-slate-50 border border-slate-300 shadow-sm transition-all hover:border-slate-400">
+              <i data-lucide="file-plus" class="w-5 h-5 mr-2 text-brand-600"></i>
+              <span>Start Free Fundraiser</span>
+            </button>
+          </div>
+
+          <!-- Trust bullets -->
+          <div class="pt-4 flex flex-wrap items-center justify-center lg:justify-start gap-6 text-xs text-slate-600 font-semibold">
+            <div class="flex items-center space-x-1.5">
+              <i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-600"></i>
+              <span>100% Tax Deductible (80G / 501c3)</span>
+            </div>
+            <div class="flex items-center space-x-1.5">
+              <i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-600"></i>
+              <span>Hospital Quota Verified</span>
+            </div>
+            <div class="flex items-center space-x-1.5">
+              <i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-600"></i>
+              <span>Instant Digital Tax Receipt</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Hero Visual Card -->
+        <div class="lg:col-span-5">
+          <div class="relative mx-auto max-w-md lg:max-w-none">
+            
+            <!-- Hero Spotlight Card -->
+            <div class="glass-card rounded-3xl p-6 shadow-xl border border-slate-200/80 relative overflow-hidden">
+              <div class="flex items-center justify-between pb-4 border-b border-slate-100">
+                <div class="flex items-center space-x-2">
+                  <span class="flex h-3 w-3 relative">
+                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span>
+                    <span class="relative inline-flex rounded-full h-3 w-3 bg-rose-500"></span>
+                  </span>
+                  <span class="text-xs font-bold text-rose-600 uppercase tracking-wider">Urgent Spotlight</span>
+                </div>
+                <span class="text-xs font-medium text-slate-400">Surgery in 3 days</span>
+              </div>
+
+              <div class="mt-4 flex space-x-4">
+                <img src="https://images.unsplash.com/photo-1516549655169-df83a0774514?auto=format&fit=crop&w=300&q=80" alt="Spotlight Patient" class="w-24 h-24 rounded-2xl object-cover shadow-inner flex-shrink-0">
+                <div>
+                  <span class="inline-block px-2 py-0.5 rounded text-[11px] font-bold bg-emerald-100 text-emerald-800 mb-1">Pediatric Cardiac</span>
+                  <h3 class="font-bold text-slate-900 leading-snug line-clamp-2">Urgent Heart Surgery for 5-Year-Old Aarav</h3>
+                  <p class="text-xs text-slate-500 mt-1 flex items-center">
+                    <i data-lucide="map-pin" class="w-3.5 h-3.5 mr-1 text-slate-400"></i> Fortis Escorts Heart Institute
+                  </p>
+                </div>
+              </div>
+
+              <!-- Spotlight Progress -->
+              <div class="mt-5 space-y-2">
+                <div class="flex justify-between text-xs font-semibold">
+                  <span class="text-emerald-700 font-bold" id="hero-spotlight-raised">$13,650 raised</span>
+                  <span class="text-slate-400">Goal: <span id="hero-spotlight-goal">$18,000</span></span>
+                </div>
+                <div class="w-full bg-slate-100 rounded-full h-2.5 overflow-hidden">
+                  <div class="bg-gradient-to-r from-emerald-500 to-tealbrand-500 h-2.5 rounded-full" style="width: 76%"></div>
+                </div>
+                <div class="flex justify-between items-center text-[11px] text-slate-500 pt-1">
+                  <span>284 donors joined</span>
+                  <span class="text-rose-600 font-bold flex items-center">
+                    <i data-lucide="clock" class="w-3 h-3 mr-1"></i> 6 days left
+                  </span>
+                </div>
+              </div>
+
+              <button onclick="app.openDetailModal('med-001')" class="mt-5 w-full py-2.5 rounded-xl font-bold text-sm text-white bg-slate-900 hover:bg-slate-800 transition-colors flex items-center justify-center space-x-1.5 shadow-md">
+                <span>View Medical Records & Donate</span>
+                <i data-lucide="arrow-right" class="w-4 h-4"></i>
+              </button>
+            </div>
+
+            <!-- Floating Trust Badge -->
+            <div class="absolute -bottom-6 -left-6 bg-white p-3.5 rounded-2xl shadow-xl border border-slate-100 flex items-center space-x-3 hidden sm:flex">
+              <div class="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center flex-shrink-0">
+                <i data-lucide="badge-check" class="w-6 h-6"></i>
+              </div>
+              <div class="text-left pr-2">
+                <div class="text-xs font-bold text-slate-900">Hospital Verified</div>
+                <div class="text-[11px] text-slate-500">Reg # FEHI/CAR/8941</div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= IMPACT & STATS COUNTER ================= -->
+  <section id="impact-stats" class="bg-white border-b border-slate-200/80 py-8">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+        
+        <div class="p-4 rounded-2xl bg-slate-50 border border-slate-100">
+          <div class="text-2xl sm:text-3xl font-extrabold text-slate-900" id="stat-total-raised">$1,840,000+</div>
+          <div class="text-xs sm:text-sm font-semibold text-slate-500 mt-1 flex items-center justify-center space-x-1">
+            <i data-lucide="coins" class="w-4 h-4 text-brand-600"></i>
+            <span>Funds Raised</span>
+          </div>
+        </div>
+
+        <div class="p-4 rounded-2xl bg-slate-50 border border-slate-100">
+          <div class="text-2xl sm:text-3xl font-extrabold text-slate-900" id="stat-total-donors">14,200+</div>
+          <div class="text-xs sm:text-sm font-semibold text-slate-500 mt-1 flex items-center justify-center space-x-1">
+            <i data-lucide="users" class="w-4 h-4 text-tealbrand-600"></i>
+            <span>Active Donors</span>
+          </div>
+        </div>
+
+        <div class="p-4 rounded-2xl bg-slate-50 border border-slate-100">
+          <div class="text-2xl sm:text-3xl font-extrabold text-slate-900" id="stat-hospitals">450+</div>
+          <div class="text-xs sm:text-sm font-semibold text-slate-500 mt-1 flex items-center justify-center space-x-1">
+            <i data-lucide="building-2" class="w-4 h-4 text-indigo-600"></i>
+            <span>Hospitals Connected</span>
+          </div>
+        </div>
+
+        <div class="p-4 rounded-2xl bg-slate-50 border border-slate-100">
+          <div class="text-2xl sm:text-3xl font-extrabold text-emerald-600" id="stat-verified-rate">99.2%</div>
+          <div class="text-xs sm:text-sm font-semibold text-slate-500 mt-1 flex items-center justify-center space-x-1">
+            <i data-lucide="shield-check" class="w-4 h-4 text-emerald-600"></i>
+            <span>Verification Rate</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= EMERGENCY URGENT SECTION ================= -->
+  <section id="urgent-section" class="py-12 bg-rose-50/50 border-b border-rose-100">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      
+      <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8">
+        <div>
+          <div class="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-rose-100 text-rose-800 text-xs font-bold mb-2">
+            <i data-lucide="alarm-clock" class="w-3.5 h-3.5 text-rose-600"></i>
+            <span>Time-Sensitive Situations</span>
+          </div>
+          <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
+            Emergency Cases Needing Urgent Support
+          </h2>
+          <p class="text-sm text-slate-600 mt-1">Patients whose surgeries or critical ICU care are scheduled within the next 48 to 72 hours.</p>
+        </div>
+        <button onclick="app.setCategoryFilter('urgent')" class="inline-flex items-center text-sm font-bold text-rose-600 hover:text-rose-700 transition-colors">
+          <span>View all urgent cases</span>
+          <i data-lucide="chevron-right" class="w-4 h-4 ml-1"></i>
+        </button>
+      </div>
+
+      <!-- Urgent Campaigns Grid (Populated dynamically) -->
+      <div id="urgent-campaigns-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <!-- Rendered by app.js -->
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ================= EXPLORE ALL FUNDRAISERS SECTION ================= -->
+  <section id="campaigns-section" class="py-14 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex-grow">
+    
+    <div class="text-center max-w-2xl mx-auto mb-10">
+      <h2 class="text-3xl font-extrabold text-slate-900 tracking-tight">
+        Verified Medical Fundraisers
+      </h2>
+      <p class="text-slate-600 text-sm mt-2">
+        Browse transparent campaigns audited by our medical verification team. Every dollar makes a direct clinical impact.
+      </p>
+    </div>
+
+    <!-- Category Pills -->
+    <div class="flex items-center space-x-2 overflow-x-auto pb-4 scrollbar-none mb-6" id="category-pills">
+      <!-- Populated by app.js -->
+    </div>
+
+    <!-- Search & Filter Controls -->
+    <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200 mb-8 flex flex-col md:flex-row items-center justify-between gap-4">
+      
+      <!-- Search Bar -->
+      <div class="relative w-full md:w-96">
+        <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2"></i>
+        <input 
+          type="text" 
+          id="search-input" 
+          placeholder="Search by patient, disease, hospital, city..." 
+          class="w-full pl-10 pr-4 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-brand-500 focus:bg-white transition-all text-slate-800 placeholder-slate-400"
+        >
+        <button id="search-clear-btn" class="hidden absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+      </div>
+
+      <!-- Quick Summary & Sort dropdown -->
+      <div class="w-full md:w-auto flex items-center justify-between md:justify-end space-x-4">
+        <span class="text-xs font-semibold text-slate-500" id="campaigns-counter">
+          Showing 6 campaigns
+        </span>
+
+        <div class="flex items-center space-x-2">
+          <label for="sort-select" class="text-xs font-semibold text-slate-500">Sort:</label>
+          <select id="sort-select" class="text-xs font-bold text-slate-700 bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 focus:outline-none focus:border-brand-500">
+            <option value="urgent">Urgency (Days Left)</option>
+            <option value="funded">Most Funded</option>
+            <option value="goal-asc">Goal: Low to High</option>
+            <option value="goal-desc">Goal: High to Low</option>
+            <option value="newest">Recently Added</option>
+          </select>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Campaigns Grid -->
+    <div id="campaigns-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      <!-- Populated dynamically by app.js -->
+    </div>
+
+    <!-- Empty State -->
+    <div id="empty-state" class="hidden py-16 text-center">
+      <div class="w-16 h-16 bg-slate-100 rounded-2xl flex items-center justify-center mx-auto text-slate-400 mb-4">
+        <i data-lucide="folder-search" class="w-8 h-8"></i>
+      </div>
+      <h3 class="text-lg font-bold text-slate-800">No campaigns found</h3>
+      <p class="text-sm text-slate-500 mt-1 max-w-sm mx-auto">
+        We couldn't find any medical fundraisers matching your search filters. Try clearing your search or exploring another category.
+      </p>
+      <button onclick="app.resetFilters()" class="mt-4 px-4 py-2 bg-slate-900 text-white text-xs font-bold rounded-xl hover:bg-slate-800">
+        Reset All Filters
+      </button>
+    </div>
+
+  </section>
+
+  <!-- ================= HOW VERIFICATION WORKS ================= -->
+  <section id="verification-section" class="py-16 bg-gradient-to-b from-slate-900 to-slate-950 text-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      
+      <div class="text-center max-w-2xl mx-auto mb-16">
+        <span class="inline-block px-3 py-1 rounded-full text-xs font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 mb-3">
+          Clinical Trust Framework
+        </span>
+        <h2 class="text-3xl sm:text-4xl font-extrabold tracking-tight">
+          How MedicalFund Ensures 100% Trust
+        </h2>
+        <p class="text-slate-400 text-sm mt-3 leading-relaxed">
+          Unlike general crowdfunding sites, medical cases require clinical scrutiny. Here is how your money safely saves lives.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        
+        <!-- Step 1 -->
+        <div class="bg-slate-800/60 rounded-3xl p-8 border border-slate-700/60 relative hover:border-emerald-500/50 transition-all">
+          <div class="w-12 h-12 rounded-2xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center mb-6 border border-emerald-500/30">
+            <i data-lucide="file-check" class="w-6 h-6"></i>
+          </div>
+          <span class="text-xs font-bold text-emerald-400 uppercase tracking-widest">Step 01</span>
+          <h3 class="text-xl font-bold mt-2 text-white">Document & Hospital Audit</h3>
+          <p class="text-slate-400 text-sm mt-3 leading-relaxed">
+            Our medical board contacts the treating hospital to verify estimate letters, diagnostic reports, and patient bed admission details.
+          </p>
+        </div>
+
+        <!-- Step 2 -->
+        <div class="bg-slate-800/60 rounded-3xl p-8 border border-slate-700/60 relative hover:border-emerald-500/50 transition-all">
+          <div class="w-12 h-12 rounded-2xl bg-teal-500/20 text-teal-400 flex items-center justify-center mb-6 border border-teal-500/30">
+            <i data-lucide="landmark" class="w-6 h-6"></i>
+          </div>
+          <span class="text-xs font-bold text-teal-400 uppercase tracking-widest">Step 02</span>
+          <h3 class="text-xl font-bold mt-2 text-white">Direct Hospital Payout</h3>
+          <p class="text-slate-400 text-sm mt-3 leading-relaxed">
+            Funds are transferred directly into the hospital's verified account against bills—preventing diversion or misuse of donors' funds.
+          </p>
+        </div>
+
+        <!-- Step 3 -->
+        <div class="bg-slate-800/60 rounded-3xl p-8 border border-slate-700/60 relative hover:border-emerald-500/50 transition-all">
+          <div class="w-12 h-12 rounded-2xl bg-indigo-500/20 text-indigo-400 flex items-center justify-center mb-6 border border-indigo-500/30">
+            <i data-lucide="receipt" class="w-6 h-6"></i>
+          </div>
+          <span class="text-xs font-bold text-indigo-400 uppercase tracking-widest">Step 03</span>
+          <h3 class="text-xl font-bold mt-2 text-white">Audited Receipts & Updates</h3>
+          <p class="text-slate-400 text-sm mt-3 leading-relaxed">
+            Every donor receives an instant tax-deductible receipt (80G / 501c3) along with clinical progress notifications during recovery.
+          </p>
+        </div>
+
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ================= FOOTER ================= -->
+  <footer class="bg-slate-950 text-slate-400 text-sm border-t border-slate-800 py-12">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+        
+        <div class="space-y-4">
+          <div class="flex items-center space-x-2 text-white font-bold text-lg">
+            <div class="w-8 h-8 rounded-xl bg-brand-600 flex items-center justify-center text-white">
+              <i data-lucide="heart-pulse" class="w-5 h-5"></i>
+            </div>
+            <span>MedicalFund</span>
+          </div>
+          <p class="text-xs text-slate-400 leading-relaxed">
+            Transparent, compassionate crowdfunding dedicated strictly to medical emergencies, critical child surgeries, and healthcare aid.
+          </p>
+        </div>
+
+        <div>
+          <h4 class="text-white font-bold text-xs uppercase tracking-wider mb-4">Quick Links</h4>
+          <ul class="space-y-2 text-xs">
+            <li><a href="#campaigns-section" class="hover:text-emerald-400 transition-colors">Browse Fundraisers</a></li>
+            <li><a href="#urgent-section" class="hover:text-emerald-400 transition-colors">Emergency Cases</a></li>
+            <li><a href="#verification-section" class="hover:text-emerald-400 transition-colors">Verification Process</a></li>
+            <li><button onclick="document.getElementById('btn-open-create').click()" class="hover:text-emerald-400 transition-colors">Start a Fundraiser</button></li>
+          </ul>
+        </div>
+
+        <div>
+          <h4 class="text-white font-bold text-xs uppercase tracking-wider mb-4">Medical Specialties</h4>
+          <ul class="space-y-2 text-xs">
+            <li><button onclick="app.setCategoryFilter('Pediatric Cardiac')" class="hover:text-emerald-400 transition-colors">Pediatric Heart Surgery</button></li>
+            <li><button onclick="app.setCategoryFilter('Cancer Care')" class="hover:text-emerald-400 transition-colors">Oncology & Chemotherapy</button></li>
+            <li><button onclick="app.setCategoryFilter('Organ Transplant')" class="hover:text-emerald-400 transition-colors">Organ Transplants</button></li>
+            <li><button onclick="app.setCategoryFilter('Rare Diseases')" class="hover:text-emerald-400 transition-colors">Rare Diseases & Gene Therapy</button></li>
+          </ul>
+        </div>
+
+        <div>
+          <h4 class="text-white font-bold text-xs uppercase tracking-wider mb-4">24/7 Medical Helpline</h4>
+          <p class="text-xs text-slate-400 leading-relaxed mb-3">
+            Need emergency fundraising assistance for an admitted patient?
+          </p>
+          <div class="inline-flex items-center space-x-2 text-emerald-400 font-bold text-sm bg-slate-900 px-3 py-2 rounded-xl border border-slate-800">
+            <i data-lucide="phone-call" class="w-4 h-4"></i>
+            <span>+1 (800) 458-CARE</span>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="pt-8 border-t border-slate-800 text-xs text-slate-500 flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div>
+          © 2026 MedicalFund Inc. All rights reserved. Registered healthcare charity foundation.
+        </div>
+        <div class="flex space-x-6">
+          <a href="#" class="hover:text-slate-400">Privacy Policy</a>
+          <a href="#" class="hover:text-slate-400">Terms of Service</a>
+          <a href="#" class="hover:text-slate-400">Clinical Disclaimer</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ================= MODALS ================= -->
+
+  <!-- 1. CAMPAIGN DETAIL MODAL -->
+  <div id="modal-detail" class="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 hidden">
+    <!-- Backdrop -->
+    <div class="modal-overlay fixed inset-0 bg-slate-900/60 backdrop-blur-sm" onclick="app.closeDetailModal()"></div>
+
+    <!-- Modal Card -->
+    <div class="modal-content relative bg-white w-full max-w-4xl max-h-[92vh] rounded-3xl shadow-2xl overflow-y-auto z-10 border border-slate-200">
+      
+      <!-- Close Button -->
+      <button onclick="app.closeDetailModal()" class="absolute top-4 right-4 z-20 w-10 h-10 rounded-full bg-white/90 hover:bg-white text-slate-600 hover:text-slate-900 shadow-md flex items-center justify-center border border-slate-200 transition-all">
+        <i data-lucide="x" class="w-5 h-5"></i>
+      </button>
+
+      <!-- Content injected by app.js -->
+      <div id="detail-modal-body"></div>
+
+    </div>
+  </div>
+
+  <!-- 2. DONATION MODAL -->
+  <div id="modal-donate" class="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 hidden">
+    <div class="modal-overlay fixed inset-0 bg-slate-900/60 backdrop-blur-sm" onclick="app.closeDonateModal()"></div>
+
+    <div class="modal-content relative bg-white w-full max-w-lg rounded-3xl shadow-2xl overflow-hidden z-10 border border-slate-200">
+      
+      <div class="p-6 bg-gradient-to-r from-emerald-600 to-tealbrand-600 text-white relative">
+        <button onclick="app.closeDonateModal()" class="absolute top-4 right-4 text-emerald-100 hover:text-white">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+        <span class="text-xs uppercase tracking-wider font-extrabold text-emerald-200">100% Tax Deductible Donation</span>
+        <h3 class="text-xl font-bold mt-1" id="donate-modal-title">Support Patient</h3>
+        <p class="text-xs text-emerald-100 mt-1" id="donate-modal-patient">Patient Name</p>
+      </div>
+
+      <form id="donation-form" class="p-6 space-y-5">
+        
+        <!-- Preset Donation Amounts -->
+        <div>
+          <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Select Contribution Amount</label>
+          <div class="grid grid-cols-4 gap-2" id="preset-amounts-grid">
+            <!-- Populated based on active currency -->
+          </div>
+          <div class="mt-3 relative">
+            <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500 font-bold text-sm" id="donate-currency-symbol">$</span>
+            <input 
+              type="number" 
+              id="custom-amount-input" 
+              placeholder="Or enter custom amount" 
+              min="1" 
+              step="any"
+              class="w-full pl-8 pr-4 py-2.5 text-sm font-bold bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-brand-500 text-slate-800"
+            >
+          </div>
+        </div>
+
+        <!-- Platform Tip Option -->
+        <div class="bg-slate-50 p-3.5 rounded-2xl border border-slate-200 text-xs space-y-2">
+          <div class="flex items-center justify-between font-semibold text-slate-700">
+            <span class="flex items-center">
+              <i data-lucide="sparkles" class="w-3.5 h-3.5 mr-1 text-amber-500"></i>
+              Support MedicalFund platform
+            </span>
+            <select id="tip-select" class="bg-white border border-slate-200 rounded-lg px-2 py-1 text-xs font-bold text-slate-700">
+              <option value="0">No tip (0%)</option>
+              <option value="5">5% tip</option>
+              <option value="10" selected>10% tip</option>
+              <option value="15">15% tip</option>
+            </select>
+          </div>
+          <p class="text-[11px] text-slate-500 leading-snug">
+            Your voluntary tip helps us keep fundraising 0% fee for needy families.
+          </p>
+        </div>
+
+        <!-- Donor Information -->
+        <div class="space-y-3">
+          <div>
+            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Your Full Name</label>
+            <input 
+              type="text" 
+              id="donor-name" 
+              placeholder="e.g. John Doe (for tax receipt)" 
+              required
+              class="w-full px-3.5 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-brand-500"
+            >
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Email (For Instant Receipt)</label>
+            <input 
+              type="email" 
+              id="donor-email" 
+              placeholder="you@example.com" 
+              required
+              class="w-full px-3.5 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-brand-500"
+            >
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Words of Encouragement (Optional)</label>
+            <textarea 
+              id="donor-message" 
+              rows="2" 
+              placeholder="e.g. Stay strong, praying for your full recovery!"
+              class="w-full px-3.5 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-brand-500 resize-none"
+            ></textarea>
+          </div>
+
+          <label class="flex items-center space-x-2 text-xs font-medium text-slate-600 cursor-pointer pt-1">
+            <input type="checkbox" id="donor-anonymous" class="rounded text-brand-600 focus:ring-brand-500 h-4 w-4">
+            <span>Keep my name anonymous on the public donors board</span>
+          </label>
+        </div>
+
+        <!-- Total Calculation & CTA -->
+        <div class="pt-2 border-t border-slate-100 flex items-center justify-between">
+          <div>
+            <span class="text-xs text-slate-500">Total Contribution:</span>
+            <div class="text-xl font-extrabold text-slate-900" id="donate-total-display">$55.00</div>
+          </div>
+          <button 
+            type="submit" 
+            class="px-6 py-3 rounded-xl font-bold text-sm text-white bg-brand-600 hover:bg-brand-700 shadow-lg shadow-emerald-600/30 transition-all"
+          >
+            Confirm & Pay
+          </button>
+        </div>
+
+      </form>
+    </div>
+  </div>
+
+  <!-- 3. TAX RECEIPT & SUCCESS MODAL -->
+  <div id="modal-receipt" class="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 hidden">
+    <div class="modal-overlay fixed inset-0 bg-slate-900/60 backdrop-blur-sm" onclick="app.closeReceiptModal()"></div>
+
+    <div class="modal-content relative bg-white w-full max-w-lg rounded-3xl shadow-2xl overflow-hidden z-10 border border-slate-200">
+      
+      <div class="p-6 text-center bg-emerald-50 border-b border-emerald-100">
+        <div class="w-16 h-16 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center mx-auto mb-3 shadow-inner">
+          <i data-lucide="check-circle" class="w-10 h-10"></i>
+        </div>
+        <h3 class="text-2xl font-extrabold text-slate-900">Thank You for Saving a Life!</h3>
+        <p class="text-xs text-slate-600 mt-1 max-w-sm mx-auto">
+          Your donation has been recorded and will be directly disbursed to the treating hospital.
+        </p>
+      </div>
+
+      <!-- Printable Area -->
+      <div id="receipt-printable-area" class="p-6 space-y-4 text-xs">
+        
+        <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+          <div>
+            <span class="font-extrabold text-slate-900 text-sm">MedicalFund Receipt</span>
+            <div class="text-[10px] text-slate-400" id="receipt-txn-id">TXN-000000</div>
+          </div>
+          <span class="px-2 py-1 bg-emerald-100 text-emerald-800 font-bold rounded text-[10px]">
+            80G / 501(c)(3) Deductible
+          </span>
+        </div>
+
+        <div class="space-y-2 text-slate-600">
+          <div class="flex justify-between">
+            <span class="text-slate-400">Patient Beneficiary:</span>
+            <span class="font-bold text-slate-800" id="receipt-patient">Patient Name</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-slate-400">Hospital Destination:</span>
+            <span class="font-medium text-slate-800 text-right max-w-[240px]" id="receipt-hospital">Hospital Name</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-slate-400">Donor Name:</span>
+            <span class="font-bold text-slate-800" id="receipt-donor">Donor Name</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-slate-400">Date & Time:</span>
+            <span class="font-medium text-slate-800" id="receipt-date">2026-10-29</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-slate-400">Tax Exemption Code:</span>
+            <span class="font-mono text-slate-700" id="receipt-tax-code">MED-80G-89912</span>
+          </div>
+        </div>
+
+        <div class="border-t border-slate-200 pt-3 flex justify-between items-center text-sm font-extrabold text-slate-900">
+          <span>Total Amount Donated:</span>
+          <span class="text-emerald-700 text-base" id="receipt-amount">$100.00</span>
+        </div>
+
+      </div>
+
+      <div class="p-6 bg-slate-50 border-t border-slate-200 flex items-center justify-between gap-3">
+        <button onclick="window.print()" class="px-4 py-2.5 rounded-xl border border-slate-300 text-slate-700 font-bold text-xs hover:bg-white flex items-center space-x-1.5 transition-colors">
+          <i data-lucide="printer" class="w-4 h-4"></i>
+          <span>Print / Save PDF</span>
+        </button>
+        <button onclick="app.closeReceiptModal()" class="px-6 py-2.5 rounded-xl bg-slate-900 text-white font-bold text-xs hover:bg-slate-800 transition-colors">
+          Close Window
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- 4. START A FUNDRAISER WIZARD MODAL -->
+  <div id="modal-create" class="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 hidden">
+    <div class="modal-overlay fixed inset-0 bg-slate-900/60 backdrop-blur-sm" onclick="app.closeCreateModal()"></div>
+
+    <div class="modal-content relative bg-white w-full max-w-2xl max-h-[90vh] rounded-3xl shadow-2xl overflow-y-auto z-10 border border-slate-200">
+      
+      <div class="p-6 bg-gradient-to-r from-slate-900 via-teal-950 to-emerald-950 text-white relative">
+        <button onclick="app.closeCreateModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+        <div class="inline-flex items-center space-x-1 px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 text-[10px] font-bold border border-emerald-500/30 mb-1">
+          <i data-lucide="shield-plus" class="w-3 h-3 mr-1"></i> Hospital Verified Campaign Creation
+        </div>
+        <h3 class="text-2xl font-extrabold tracking-tight">Start a Medical Fundraiser</h3>
+        <p class="text-xs text-slate-300 mt-1">Get financial assistance for medical emergencies, surgeries, and critical treatments.</p>
+
+        <!-- Stepper Indicator -->
+        <div class="flex items-center space-x-2 mt-6">
+          <div class="flex-1 h-1.5 rounded-full bg-emerald-500" id="step-ind-1"></div>
+          <div class="flex-1 h-1.5 rounded-full bg-slate-700" id="step-ind-2"></div>
+          <div class="flex-1 h-1.5 rounded-full bg-slate-700" id="step-ind-3"></div>
+        </div>
+      </div>
+
+      <form id="create-fundraiser-form" class="p-6 space-y-6">
+        
+        <!-- STEP 1: PATIENT & MEDICAL DETAILS -->
+        <div id="wizard-step-1" class="space-y-4">
+          <h4 class="text-sm font-extrabold text-slate-800 uppercase tracking-wider flex items-center">
+            <span class="w-6 h-6 rounded-full bg-emerald-100 text-emerald-700 inline-flex items-center justify-center text-xs mr-2">1</span>
+            Patient & Medical Details
+          </h4>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1">Patient Full Name *</label>
+              <input type="text" id="new-patient-name" required placeholder="e.g. John Doe" class="w-full px-3.5 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-brand-500">
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1">Patient Age & Gender *</label>
+              <div class="flex space-x-2">
+                <input type="number" id="new-patient-age" required min="0" max="120" placeholder="Age" class="w-1/2 px-3.5 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-brand-500">
+                <select id="new-patient-gender" class="w-1/2 px-3.5 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-brand-500">
+                  <option value="Male">Male</option>
+                  <option value="Female">Female</option>
+                  <option value="Child / Infant">Child / Infant</option>
+                  <option value="Other">Other</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1">Medical Category *</label>
+              <select id="new-category" class="w-full px-3.5 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-brand-500 font-semibold">
+                <option value="Pediatric Cardiac">Pediatric Cardiac</option>
+                <option value="Cancer Care">Cancer Care</option>
+                <option value="Accident & Trauma">Accident & Trauma</option>
+                <option value="Organ Transplant">Organ Transplant</option>
+                <option value="Rare Diseases">Rare Diseases</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1">Your Relationship to Patient *</label>
+              <input type="text" id="new-relationship" required placeholder="e.g. Father, Spouse, Self, Sibling" class="w-full px-3.5 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-brand-500">
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">Diagnosis / Medical Condition *</label>
+            <input type="text" id="new-condition" required placeholder="e.g. Stage 2 Hodgkin Lymphoma / Acute Trauma Craniotomy" class="w-full px-3.5 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-brand-500">
+          </div>
+
+          <div class="flex justify-end pt-2">
+            <button type="button" onclick="app.goToWizardStep(2)" class="px-6 py-2.5 rounded-xl font-bold text-xs text-white bg-slate-900 hover:bg-slate-800 transition-colors flex items-center space-x-1">
+              <span>Next: Hospital & Treatment Details</span>
+              <i data-lucide="arrow-right" class="w-4 h-4"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- STEP 2: HOSPITAL & FINANCIAL GOAL -->
+        <div id="wizard-step-2" class="space-y-4 hidden">
+          <h4 class="text-sm font-extrabold text-slate-800 uppercase tracking-wider flex items-center">
+            <span class="w-6 h-6 rounded-full bg-emerald-100 text-emerald-700 inline-flex items-center justify-center text-xs mr-2">2</span>
+            Hospital & Target Goal
+          </h4>
+
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">Treating Hospital Name & Branch *</label>
+            <input type="text" id="new-hospital" required placeholder="e.g. Apollo Hospital, Chennai / Massachusetts General Hospital" class="w-full px-3.5 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-brand-500">
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1">Attending Physician / Surgeon</label>
+              <input type="text" id="new-doctor" placeholder="e.g. Dr. Rajesh Sharma" class="w-full px-3.5 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-brand-500">
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1">City & State *</label>
+              <input type="text" id="new-city" required placeholder="e.g. Boston, MA or Mumbai" class="w-full px-3.5 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-brand-500">
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1">Target Amount Needed ($ USD) *</label>
+              <input type="number" id="new-goal" required min="100" placeholder="e.g. 25000" class="w-full px-3.5 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-brand-500 font-bold">
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1">Estimated Days to Surgery / Treatment *</label>
+              <input type="number" id="new-days" required min="1" max="180" placeholder="e.g. 14" class="w-full px-3.5 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-brand-500">
+            </div>
+          </div>
+
+          <label class="flex items-center space-x-2 text-xs font-medium text-rose-700 cursor-pointer pt-1 bg-rose-50 p-2.5 rounded-xl border border-rose-200">
+            <input type="checkbox" id="new-is-urgent" class="rounded text-rose-600 focus:ring-rose-500 h-4 w-4">
+            <span class="font-bold">Mark as Critical / Emergency (Treatment needed within 5 days)</span>
+          </label>
+
+          <div class="flex justify-between pt-2">
+            <button type="button" onclick="app.goToWizardStep(1)" class="px-4 py-2.5 rounded-xl font-bold text-xs text-slate-600 bg-slate-100 hover:bg-slate-200 transition-colors">
+              Back
+            </button>
+            <button type="button" onclick="app.goToWizardStep(3)" class="px-6 py-2.5 rounded-xl font-bold text-xs text-white bg-slate-900 hover:bg-slate-800 transition-colors flex items-center space-x-1">
+              <span>Next: Story & Documents</span>
+              <i data-lucide="arrow-right" class="w-4 h-4"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- STEP 3: STORY, IMAGE & PROOF UPLOAD -->
+        <div id="wizard-step-3" class="space-y-4 hidden">
+          <h4 class="text-sm font-extrabold text-slate-800 uppercase tracking-wider flex items-center">
+            <span class="w-6 h-6 rounded-full bg-emerald-100 text-emerald-700 inline-flex items-center justify-center text-xs mr-2">3</span>
+            Story & Verification Proofs
+          </h4>
+
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">Campaign Headline *</label>
+            <input type="text" id="new-title" required placeholder="e.g. Help baby Maya receive urgent heart stent surgery" class="w-full px-3.5 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-brand-500">
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">Patient Story & Family Appeal *</label>
+            <textarea id="new-story" required rows="4" placeholder="Describe the medical situation, how the diagnosis was discovered, what treatment is required, and why financial assistance is needed." class="w-full px-3.5 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-brand-500"></textarea>
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">Patient Photo URL (Optional)</label>
+            <input type="url" id="new-image" placeholder="https://images.unsplash.com/photo-..." class="w-full px-3.5 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-brand-500">
+            <p class="text-[11px] text-slate-400 mt-1">Leave empty to use a high-quality medical relief placeholder.</p>
+          </div>
+
+          <!-- Document Upload Simulation -->
+          <div class="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-xs space-y-2">
+            <span class="font-bold text-emerald-900 flex items-center">
+              <i data-lucide="file-up" class="w-4 h-4 mr-1 text-emerald-700"></i>
+              Hospital Estimate Letter & Doctor Prescription
+            </span>
+            <p class="text-emerald-800 leading-relaxed text-[11px]">
+              Our system simulates immediate verification and assigns an official hospital quota code to your fundraiser upon submission.
+            </p>
+          </div>
+
+          <div class="flex justify-between pt-2">
+            <button type="button" onclick="app.goToWizardStep(2)" class="px-4 py-2.5 rounded-xl font-bold text-xs text-slate-600 bg-slate-100 hover:bg-slate-200 transition-colors">
+              Back
+            </button>
+            <button type="submit" class="px-6 py-2.5 rounded-xl font-bold text-xs text-white bg-brand-600 hover:bg-brand-700 shadow-md shadow-emerald-600/30 transition-all flex items-center space-x-1.5">
+              <i data-lucide="check" class="w-4 h-4"></i>
+              <span>Publish Verified Fundraiser</span>
+            </button>
+          </div>
+        </div>
+
+      </form>
+
+    </div>
+  </div>
+
+  <!-- 5. MY RECEIPTS MODAL -->
+  <div id="modal-all-receipts" class="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 hidden">
+    <div class="modal-overlay fixed inset-0 bg-slate-900/60 backdrop-blur-sm" onclick="app.closeAllReceiptsModal()"></div>
+
+    <div class="modal-content relative bg-white w-full max-w-xl max-h-[85vh] rounded-3xl shadow-2xl overflow-y-auto z-10 border border-slate-200 p-6">
+      <div class="flex items-center justify-between border-b border-slate-100 pb-4 mb-4">
+        <div>
+          <h3 class="text-lg font-extrabold text-slate-900">Your Donation Receipts</h3>
+          <p class="text-xs text-slate-500">All contributions are tax-exempt (80G / 501c3 compliant).</p>
+        </div>
+        <button onclick="app.closeAllReceiptsModal()" class="text-slate-400 hover:text-slate-700">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <div id="all-receipts-list" class="space-y-3">
+        <!-- Rendered by app.js -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div id="toast" class="fixed bottom-6 right-6 z-50 transform translate-y-24 opacity-0 transition-all duration-300 pointer-events-none">
+    <div class="bg-slate-900 text-white px-5 py-3.5 rounded-2xl shadow-xl flex items-center space-x-3 border border-slate-800 text-xs font-semibold">
+      <div id="toast-icon" class="text-emerald-400">
+        <i data-lucide="check-circle" class="w-5 h-5"></i>
+      </div>
+      <span id="toast-message">Notification message</span>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="js/data.js"></script>
+  <script src="js/storage.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
